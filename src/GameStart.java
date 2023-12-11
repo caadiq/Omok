@@ -1,5 +1,68 @@
-public class GameStart {
-    public static void main(String[] args) {
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 
+
+public class GameStart extends JFrame {
+    private static final int frameWidth = 500;
+    private static final int frameHeight = 120;
+
+    private final JTextField textField;
+
+    public GameStart() {
+        setTitle("윷놀이");
+        setSize(frameWidth, frameHeight);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setLayout(null);
+
+        JLabel label = new JLabel("닉네임");
+        label.setBounds(20, 28, 100, 26);
+        label.setFont(new Font("Dialog", Font.PLAIN, 26));
+        add(label);
+
+        textField = new JTextField();
+        textField.setBounds(120, 20, 240, 45);
+        textField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        textField.setFont(new Font("Dialog", Font.PLAIN, 22));
+        add(textField);
+
+        JButton button = new JButton("입장");
+        button.setBounds(380, 20, 90, 45);
+        button.setFont(new Font("Dialog", Font.PLAIN, 22));
+        button.addActionListener(e -> enterServer());
+        add(button);
+
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    }
+
+    private void enterServer() {
+        String nickname = textField.getText().trim();
+
+        if (nickname.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "닉네임을 입력해주세요.");
+        } else {
+            try {
+                String[] message = Stream.getInstance().receiveMessage();
+                if (message[0].equals("Room")) {
+                    String roomState = message[1];
+                    if (roomState.equals("입장가능")) {
+                        Nickname.getInstance().setNickname(nickname);
+                        SwingUtilities.invokeLater(MainFrame::new);
+                        this.dispose();
+                    } else if (roomState.equals("입장불가능")) {
+                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "방이 꽉찼습니다."));
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(GameStart::new);
     }
 }
