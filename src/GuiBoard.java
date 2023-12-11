@@ -5,14 +5,18 @@ public class GuiBoard extends JPanel {
     private static final int layoutWidth = 940;
     private static final int layoutHeight = 940;
 
+    GameMethod gm = new GameMethod();
+
     private final int CELL = 47; // 선 간격
     private final int SIZE = 19; // 가로, 세로 선 개수
     private final int STONE_SIZE = 28;
 
-    public GuiBoard() {
+    public GuiBoard(MainFrame m) {
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
         setBackground(new Color(206, 167, 61));
+        MouseAction Mc = new MouseAction(gm,this, m);
+        addMouseListener(Mc);
     }
 
     @Override
@@ -20,6 +24,7 @@ public class GuiBoard extends JPanel {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         drawBoard(g);
+        drawStone(g);
     }
 
     // 오목판 그리기
@@ -57,14 +62,23 @@ public class GuiBoard extends JPanel {
     }
 
     private void drawStone(Graphics g) {
-
+        for(int y=0;y<SIZE;y++){
+            for(int x=0;x<SIZE;x++){
+                if(gm.getMap()[y][x]==1)
+                    drawBlackStone(g,x,y);
+                else if(gm.getMap()[y][x]==2)
+                    drawWhiteStone(g, x, y);
+            }
+        }
     }
 
     private void drawBlackStone(Graphics g, int x, int y) {
-
+        g.setColor(Color.BLACK);
+        g.fillOval(x*CELL+32, y*CELL+79, STONE_SIZE, STONE_SIZE);
     }
 
     private void drawWhiteStone(Graphics g, int x, int y) {
-
+        g.setColor(Color.WHITE);
+        g.fillOval(x*CELL+32, y*CELL+79, STONE_SIZE, STONE_SIZE);
     }
 }

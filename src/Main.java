@@ -14,7 +14,7 @@ class MainFrame extends JFrame {
         setLayout(null); // 레이아웃 맘대로 설정
 
         // 오목판
-        GuiBoard guiBoard = new GuiBoard();
+        GuiBoard guiBoard = new GuiBoard(this);
         guiBoard.setLocation(10, 10);
         add(guiBoard);
 
