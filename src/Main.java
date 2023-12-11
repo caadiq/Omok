@@ -4,6 +4,8 @@ class MainFrame extends JFrame {
     private static final int frameWidth = 1360;
     private static final int frameHeight = 1000;
 
+    private final Stream stream = Stream.getInstance();
+
     public MainFrame() {
         setTitle("오목");
         setSize(frameWidth, frameHeight);
@@ -33,6 +35,20 @@ class MainFrame extends JFrame {
 
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        new Thread(() -> {
+            while (true) {
+                try {
+                    String[] message = stream.receiveMessage();
+                    switch (message[0]) {
+                        case "Chat" -> guiChat.setMessage(message);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }).start();
     }
 }
 
