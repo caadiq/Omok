@@ -13,8 +13,13 @@ class MainFrame extends JFrame {
         setLocationRelativeTo(null); // 창 가운데 표시
         setLayout(null); // 레이아웃 맘대로 설정
 
+        // 버튼
+        GuiButton guiButton = new GuiButton(this);
+        guiButton.setLocation(960, 880);
+        add(guiButton);
+
         // 오목판
-        GuiBoard guiBoard = new GuiBoard(this);
+        GuiBoard guiBoard = new GuiBoard(this,guiButton);
         guiBoard.setLocation(10, 10);
         add(guiBoard);
 
@@ -28,11 +33,6 @@ class MainFrame extends JFrame {
         guiChat.setLocation(960, 400);
         add(guiChat);
 
-        // 버튼
-        GuiButton guiButton = new GuiButton();
-        guiButton.setLocation(960, 880);
-        add(guiButton);
-
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -42,6 +42,8 @@ class MainFrame extends JFrame {
                     String[] message = stream.receiveMessage();
                     switch (message[0]) {
                         case "Chat" -> guiChat.setMessage(message);
+                        case "Ready" -> guiButton.printGameStart(message);
+                        case "numbercheck" -> guiButton.canGameStart(message);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -50,6 +52,7 @@ class MainFrame extends JFrame {
             }
         }).start();
     }
+
 }
 
 public class Main {

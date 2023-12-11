@@ -5,9 +5,9 @@ import java.io.IOException;
 public class GuiChat extends JPanel {
     private static final int layoutWidth = 380;
     private static final int layoutHeight = 430;
-
     private final Stream stream = Stream.getInstance();
     private JTextArea textArea;
+
     public GuiChat() {
         setLayout(new BorderLayout());
         setSize(layoutWidth, layoutHeight);
@@ -44,4 +44,6 @@ public class GuiChat extends JPanel {
     public void setMessage(String[] message) {
         SwingUtilities.invokeLater(() -> textArea.append(message[1] + "\n"));
     }
+
+
 }

@@ -6,14 +6,19 @@ public class MouseAction extends MouseAdapter {
     private GameMethod gm;
     private GuiBoard sm;
     private MainFrame g;
+    private GuiButton guiButton;
 
-    public MouseAction(GameMethod gm, GuiBoard mm, MainFrame g) {
+    public MouseAction(GameMethod gm, GuiBoard mm, MainFrame g, GuiButton guiButton) {
         this.g=g;
         this.gm=gm;
         this.sm=mm;
+        this.guiButton=guiButton;
     }
     @Override
     public void mousePressed(MouseEvent me) {
+        if(guiButton.getIngame() == 0){
+            return;
+        }
         int x = (int)Math.round(me.getX()/(double) 47)-1;
         int y = (int)Math.round(me.getY()/(double) 47)-2;
 
@@ -21,9 +26,8 @@ public class MouseAction extends MouseAdapter {
             return;
         }
 
-        Word w = new Word(y,x,gm.getCun_GamePlayer());
+        Word w = new Word(y,x, guiButton.getColor()+1);
         gm.inputWord(w);
-        gm.nextPlayer(gm.getCun_GamePlayer());
         sm.repaint();
         if(gm.endGame(w)==true) {
             String ms = " ";
