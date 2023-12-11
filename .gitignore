@@ -55,6 +55,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
+.idea
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -84,8 +85,8 @@ fabric.properties
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
 # *.iml
-modules.xml
-.idea/misc.xml
+# modules.xml
+# .idea/misc.xml
 # *.ipr
 
 # Sonarlint plugin
