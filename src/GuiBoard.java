@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class GuiBoard extends JPanel {
     private static final int layoutWidth = 940;
@@ -7,16 +8,20 @@ public class GuiBoard extends JPanel {
     GuiButton guiButton;
     GameMethod gm = new GameMethod();
 
+    MainFrame m;
+
     private final int CELL = 47; // 선 간격
     private final int SIZE = 19; // 가로, 세로 선 개수
     private final int STONE_SIZE = 28;
+    MouseAction Mc;
 
     public GuiBoard(MainFrame m,GuiButton guiButton) {
+        this.m=m;
         this.guiButton=guiButton;
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
         setBackground(new Color(206, 167, 61));
-        MouseAction Mc = new MouseAction(gm,this, m, guiButton);
+        Mc = new MouseAction(gm,this, m, guiButton);
         addMouseListener(Mc);
     }
 
@@ -82,4 +87,38 @@ public class GuiBoard extends JPanel {
         g.setColor(Color.WHITE);
         g.fillOval(x*CELL+32, y*CELL+79, STONE_SIZE, STONE_SIZE);
     }
+
+    public void getStone(String[] msg){
+        String result = msg[1];
+        String[] receiveStone = result.trim().split(",");
+        int checkColor = Integer.parseInt(receiveStone[2]);
+        if(checkColor == (guiButton.getColor()+1)){
+            return;
+        }
+        int y = Integer.parseInt(receiveStone[0]);
+        int x = Integer.parseInt(receiveStone[1]);
+        Word w = new Word(y,x, checkColor);
+
+        gm.inputWord(w);
+        repaint();
+        Mc.setMyturn(true);
+        Mc.setFirstTurn(false);
+        if(gm.endGame(w)==true) {
+            String ms = " ";
+            if(w.getColor()==1) {
+                ms="검돌승리!";
+            }
+            else if(w.getColor()==2) {
+                ms="백돌승리!";
+            }
+            showWin(ms);
+        }
+    }
+
+    public void showWin(String msg) {
+        System.out.println(msg);
+        gm.init();
+        JOptionPane.showMessageDialog(m, msg, "",JOptionPane.INFORMATION_MESSAGE);
+    }
+
 }

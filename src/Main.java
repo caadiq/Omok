@@ -44,6 +44,7 @@ class MainFrame extends JFrame {
                         case "Chat" -> guiChat.setMessage(message);
                         case "Ready" -> guiButton.printGameStart(message);
                         case "numbercheck" -> guiButton.canGameStart(message);
+                        case "Stone" -> guiBoard.getStone(message);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
