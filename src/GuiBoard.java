@@ -4,18 +4,19 @@ import java.awt.*;
 public class GuiBoard extends JPanel {
     private static final int layoutWidth = 940;
     private static final int layoutHeight = 940;
-
+    GuiButton guiButton;
     GameMethod gm = new GameMethod();
 
     private final int CELL = 47; // 선 간격
     private final int SIZE = 19; // 가로, 세로 선 개수
     private final int STONE_SIZE = 28;
 
-    public GuiBoard(MainFrame m) {
+    public GuiBoard(MainFrame m,GuiButton guiButton) {
+        this.guiButton=guiButton;
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
         setBackground(new Color(206, 167, 61));
-        MouseAction Mc = new MouseAction(gm,this, m);
+        MouseAction Mc = new MouseAction(gm,this, m, guiButton);
         addMouseListener(Mc);
     }
 

@@ -10,7 +10,7 @@ public class Server {
     private static final int SERVER_PORT = 10000;
 
     private static final int USER_LIMIT = 2;
-
+    public int readyCount =0;
     private ServerSocket socket;
     private Socket clientSocket;
 
@@ -116,6 +116,12 @@ public class Server {
             while (true) {
                 try {
                     String msg = dataInputStream.readUTF();
+                    String[] type = msg.trim().split("\\|");
+                    if(type[0].equals("Ready")){
+                        readyCount+=1;
+                        msg+="|";
+                        msg+=readyCount;
+                    }
                     msg = msg.trim();
                     System.out.println(msg);
                     WriteAll(msg + "\n");
@@ -126,7 +132,7 @@ public class Server {
                         clientSocket.close();
                         userVector.removeElement(this);
                         System.out.println("플레이어 퇴장. 현재 플레이어 수 : " + userVector.size());
-
+                        readyCount-=1;
                         int i = 0;
                         for(UserService userService : userVector) {
                             userService.dataOutputStream.writeUTF("numbercheck|" + userVector.size() + "|" + i);
