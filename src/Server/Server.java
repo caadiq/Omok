@@ -4,17 +4,21 @@ import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class Server {
     private static final int SERVER_PORT = 10000;
-
     private static final int USER_LIMIT = 2;
-    public int readyCount =0;
-    private ServerSocket socket;
+
+    private ServerSocket serverSocket;
     private Socket clientSocket;
 
     private final Vector<UserService> userVector = new Vector<>();
+
+    public int readyCount = 0;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -28,7 +32,7 @@ public class Server {
 
     public Server() {
         try {
-            socket = new ServerSocket(SERVER_PORT);
+            serverSocket = new ServerSocket(SERVER_PORT);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,26 +41,48 @@ public class Server {
         acceptServer.start();
     }
 
+    // 플레이어 감지
+    public void detectPlayer() {
+        // 현재 플레이어 수를 모든 유저에게 전송
+        for (UserService userService : userVector) {
+            userService.WriteOne("PlayerCount|" + userVector.size());
+        }
+    }
+
+    // 흑돌, 백돌 랜덤으로 정하기
+    public void setStone() {
+        List<String> stones = new ArrayList<>();
+        stones.add("검은색");
+        stones.add("흰색");
+        Collections.shuffle(stones); // 리스트 섞기
+
+        // 섞은 값을 각 유저에게 전송
+        for (int i = 0; i < userVector.size(); i++) {
+            UserService user = userVector.get(i);
+            user.WriteOne("StoneColor|" + stones.get(i));
+            user.WriteOne("Turn|검은색");
+        }
+    }
+
     class AcceptServer extends Thread {
         public void run() {
             while (true) {
                 try {
-                    System.out.println("플레이어 대기 중...");
-                    clientSocket = socket.accept();
+                    clientSocket = serverSocket.accept();
 
                     UserService newUser = new UserService(clientSocket);
                     if (userVector.size() < USER_LIMIT) {
                         userVector.add(newUser);
                         System.out.println("플레이어 입장, 현재 플레이어 수 : " + userVector.size());
                         newUser.start();
-
-                        int i = 0;
-                        for(UserService userService: userVector) {
-                            userService.dataOutputStream.writeUTF("numbercheck|" + userVector.size() + "|" + i);
-                            i++;
-                        }
+                        detectPlayer();
                     } else {
                         clientSocket.close();
+                    }
+
+                    // 플레이어가 모두 접속하면 돌 설정
+                    if (userVector.size() == USER_LIMIT) {
+                        setStone();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -78,6 +104,7 @@ public class Server {
                 dataInputStream = new DataInputStream(inputStream);
                 dataOutputStream = new DataOutputStream(outputStream);
 
+                // 입장 가능 여부를 플레이어에게 전송
                 if (userVector.size() < USER_LIMIT) {
                     dataOutputStream.writeUTF("Room|입장가능");
                 } else {
@@ -103,6 +130,7 @@ public class Server {
                 }
 
                 userVector.removeElement(this);
+                detectPlayer();
             }
         }
 
@@ -117,13 +145,22 @@ public class Server {
                 try {
                     String msg = dataInputStream.readUTF();
                     String[] type = msg.trim().split("\\|");
-                    if(type[0].equals("Ready")){
-                        readyCount+=1;
-                        msg+="|";
-                        msg+=readyCount;
+
+                    if (type[0].equals("Ready")) {
+                        readyCount += 1; // 준비 완료된 플레이어 수 증가
+                        msg = "Ready|" + readyCount;
+                    } else if (type[0].equals("Turn")) {
+                        msg = "Turn|";
+                        // 현재 턴이 검은색이면 흰색으로 바꾸고 흰색이라면 검은색으로 변경
+                        if (type[1].equals("검은색")) {
+                            msg += "흰색";
+                        } else if (type[1].equals("흰색")) {
+                            msg += "검은색";
+                        }
+                        System.out.println(msg);
                     }
+
                     msg = msg.trim();
-                    System.out.println(msg);
                     WriteAll(msg + "\n");
                 } catch (IOException e1) {
                     try {
@@ -131,14 +168,9 @@ public class Server {
                         dataInputStream.close();
                         clientSocket.close();
                         userVector.removeElement(this);
+                        detectPlayer();
+                        readyCount -= 1;
                         System.out.println("플레이어 퇴장. 현재 플레이어 수 : " + userVector.size());
-                        readyCount-=1;
-                        int i = 0;
-                        for(UserService userService : userVector) {
-                            userService.dataOutputStream.writeUTF("numbercheck|" + userVector.size() + "|" + i);
-                            i++;
-                        }
-
                         break;
                     } catch (Exception e2) {
                         break;

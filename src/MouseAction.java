@@ -1,80 +1,65 @@
-import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 
 public class MouseAction extends MouseAdapter {
-    private GameMethod gm;
-    private GuiBoard sm;
-    private MainFrame g;
-    private GuiButton guiButton;
+    private final GameMethod gameMethod;
+    private final GuiBoard guiBoard;
 
-    Stream stream = Stream.getInstance();
+    private final Stream stream;
+    private final MyStone myStone;
+    private final Turn turn;
 
-    Boolean myturn = true;
+    public MouseAction(GameMethod gameMethod, GuiBoard guiBoard) {
+        this.gameMethod = gameMethod;
+        this.guiBoard = guiBoard;
 
-    Boolean firstTurn = true;
-
-    public MouseAction(GameMethod gm, GuiBoard mm, MainFrame g, GuiButton guiButton) {
-        this.g=g;
-        this.gm=gm;
-        this.sm=mm;
-        this.guiButton=guiButton;
+        stream  = Stream.getInstance();
+        myStone = MyStone.getInstance();
+        turn = Turn.getInstance();
     }
+
     @Override
-    public void mousePressed(MouseEvent me) {
-        if(guiButton.getIngame() == 0 || !myturn){
-            return;
-        }
-        if(firstTurn){
-            if(guiButton.getColor()==0){
-                firstTurn = false;
-            }
-            else{
-                return;
-            }
-        }
-        int x = (int)Math.round(me.getX()/(double) 47)-1;
-        int y = (int)Math.round(me.getY()/(double) 47)-2;
+    public void mousePressed(MouseEvent mouseEvent) {
+        String currentTurn = turn.getTurn();
+        String myStoneColor = myStone.getMyStone();
 
-        if(gm.checkInput(y, x) == false) {
+        // 내 턴이 아니면 클릭 방지
+        if (!currentTurn.equals(myStoneColor)) {
             return;
         }
 
-        Word w = new Word(y,x, guiButton.getColor()+1);
-        gm.inputWord(w);
-        sm.repaint();
-        myturn=false;
-        String msg="Stone|"+y+","+x+","+(guiButton.getColor()+1);
+        // 클릭 좌표값
+        int x = (int) Math.round(mouseEvent.getX() / (double) 47 - 1);
+        int y = (int) Math.round(mouseEvent.getY() / (double) 47 - 1);
+
+        // 오목판 범위 벗어나면 클릭 방지
+        if (x < 0 || x >= 19 || y < 0 || y >= 19) {
+            return;
+        }
+
+        // 클릭한 위치에 돌이 이미 놓여져 있는지 확인
+        if (!gameMethod.checkStone(y, x)) {
+            return;
+        }
+
+        Stone stone = new Stone(y, x, myStoneColor);
+        gameMethod.putStone(stone);
+        guiBoard.repaint();
+
         try {
-            stream.sendMessage(msg);
+            stream.sendMessage("Turn|" + myStoneColor); // 내 턴임을 서버로 전송
+            stream.sendMessage("StonePosition|" + y + "," + x + "," + myStoneColor); // 놓은 돌의 좌표와 색을 서버로 전송
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
-        if(gm.endGame(w)==true) {
-            String ms = " ";
-            if(w.getColor()==1) {
-                ms="검돌승리!";
+        if (gameMethod.endGame(stone)) {
+            try {
+                stream.sendMessage("Winner|" + currentTurn);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            else if(w.getColor()==2) {
-                ms="백돌승리!";
-            }
-            showWin(ms);
         }
-    }
-
-    public void setMyturn(Boolean myturn) {
-        this.myturn = myturn;
-    }
-
-    public void setFirstTurn(Boolean firstTurn) {
-        this.firstTurn = firstTurn;
-    }
-
-    public void showWin(String msg) {
-        System.out.println(msg);
-        gm.init();
-        JOptionPane.showMessageDialog(g, msg, "",JOptionPane.INFORMATION_MESSAGE);
     }
 }

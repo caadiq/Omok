@@ -2,23 +2,24 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-
 public class GuiButton extends JPanel {
     private static final int layoutWidth = 375;
     private static final int layoutHeight = 70;
-    private final Stream stream = Stream.getInstance();
+
+    private final Stream stream;
+    private final MainFrame mainFrame;
+    private final MyStone myStone;
+
     private final JButton buttonBacksies;
     private final JButton buttonReady;
-    MainFrame m;
-    private int count=0;
 
-    private int Ingame = 0;
+    private int playerCount = 0;
 
-    int color=0;
+    public GuiButton(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+        stream = Stream.getInstance();
+        myStone = MyStone.getInstance();
 
-
-    public GuiButton(MainFrame m) {
-        this.m=m;
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
 
@@ -28,12 +29,11 @@ public class GuiButton extends JPanel {
         buttonReady.setLocation(0, 0);
         buttonReady.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonReady.addActionListener(e -> {
-            if(count!=2){
-                JOptionPane.showMessageDialog(m, "상대방이 아직 들어오지 않았습니다", "",JOptionPane.INFORMATION_MESSAGE);
-            }
-            else{
+            if (playerCount != 2) {
+                JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE);
+            } else {
                 try {
-                    stream.sendMessage("Ready|"+"Ready");
+                    stream.sendMessage("Ready|" + "Ready");
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -60,35 +60,15 @@ public class GuiButton extends JPanel {
         add(buttonBacksies);
     }
 
-    public void printGameStart(String[] message){
-        if(message[2].equals("1")){
+    public void setPlayerCount(String[] message) {
+        playerCount = Integer.parseInt(message[1]);
+    }
+
+    public void printGameStart(String[] message) {
+        if (message[1].equals("2")) {
+            String color = myStone.getMyStone();
+            String msg = "게임시작! 당신은 " + color + "입니다.";
+            JOptionPane.showMessageDialog(mainFrame, msg, "", JOptionPane.INFORMATION_MESSAGE);
         }
-        else if(message[2].equals("2")){
-            String msg=" ";
-            if(color==1){
-                msg="게임 시작! 당신은 흰색입니다.";
-            }
-            if(color==0){
-                msg="게임 시작! 당신은 검은색입니다.";
-            }
-            JOptionPane.showMessageDialog(m, msg, "",JOptionPane.INFORMATION_MESSAGE);
-            Ingame = 1;
-        }
-    }
-
-    public void canGameStart(String[] message){
-        int number = Integer.parseInt(message[1]);
-        System.out.println("서버에 접속중인 사람 수:" + number);
-        count = number;
-        color = Integer.parseInt(message[2]);
-        System.out.println(color);
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public int getIngame() {
-        return Ingame;
     }
 }
