@@ -28,7 +28,7 @@ public class GuiPlayer extends JPanel {
 
         JLabel jLabel1 = new JLabel("나");
         jLabel1.setSize(20, 20);
-        jLabel1.setLocation(imageLength / 2 - 10, imageLength + 10);
+        jLabel1.setLocation(imageLength / 2 - 5, imageLength + 10);
         jLabel1.setFont(new Font("Dialog", Font.BOLD, 20));
         add(jLabel1);
 
