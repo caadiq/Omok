@@ -12,13 +12,13 @@ public class GuiBoard extends JPanel {
     private GameMethod gameMethod;
 
     public GuiBoard(GameMethod gameMethod) {
-        this.gameMethod =gameMethod;
+        this.gameMethod = gameMethod;
 
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
         setBackground(new Color(206, 167, 61));
 
-        MouseAction mouseAction = new MouseAction(new GameMethod(), this);
+        MouseAction mouseAction = new MouseAction(gameMethod, this);
         addMouseListener(mouseAction);
     }
 
