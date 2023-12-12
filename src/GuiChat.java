@@ -48,4 +48,12 @@ public class GuiChat extends JPanel {
     public void setMessage(String[] message) {
         SwingUtilities.invokeLater(() -> textArea.append(message[1] + "\n"));
     }
+
+    public void setUserEntered(String[] message) {
+        SwingUtilities.invokeLater(() -> textArea.append(message[1] + "님이 입장하셨습니다" + "\n"));
+    }
+
+    public void setUserOut(String[] message) {
+        SwingUtilities.invokeLater(() -> textArea.append(message[1] + "님이 퇴장하셨습니다" + "\n"));
+    }
 }

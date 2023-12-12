@@ -1,4 +1,7 @@
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 public class MainFrame extends JFrame {
     private static final int frameWidth = 1360;
@@ -9,6 +12,7 @@ public class MainFrame extends JFrame {
     private final Turn turn;
 
     public MainFrame() {
+        String nickname = Nickname.getInstance().getNickname();
         stream = Stream.getInstance();
         myStone = MyStone.getInstance();
         turn = Turn.getInstance();
@@ -42,6 +46,19 @@ public class MainFrame extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        addWindowListener(new WindowAdapter() { // 윈도우가 닫혔을 때, 상대방에게 메세지 전송 뒤 프로그램 종료
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("프로그램 종료 혹은 다른 작업 수행");
+                try {
+                    stream.sendMessage("Nicknameout|" + nickname);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.exit(0); // 프로그램 종료
+            }
+        });
+
         new Thread(() -> {
             while (true) {
                 try {
@@ -53,6 +70,8 @@ public class MainFrame extends JFrame {
                         case "StoneColor" -> myStone.setMyStone(message[1]);
                         case "Chat" -> guiChat.setMessage(message);
                         case "Turn" -> turn.setTurn(message[1]);
+                        case "Nicknamein" -> guiChat.setUserEntered(message);
+                        case "Nicknameout" -> guiChat.setUserOut(message);
                         case "Winner" -> {
                             String result;
                             if (message[1].equals(myStone.getMyStone()))
@@ -68,5 +87,10 @@ public class MainFrame extends JFrame {
                 }
             }
         }).start();
+        try {
+            stream.sendMessage("Nicknamein|" + nickname);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
