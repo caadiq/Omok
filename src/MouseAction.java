@@ -7,6 +7,7 @@ public class MouseAction extends MouseAdapter {
     private final GuiBoard guiBoard;
 
     private final Stream stream;
+    private final State state;
     private final MyStone myStone;
     private final Turn turn;
 
@@ -15,6 +16,7 @@ public class MouseAction extends MouseAdapter {
         this.guiBoard = guiBoard;
 
         stream = Stream.getInstance();
+        state = State.getInstance();
         myStone = MyStone.getInstance();
         turn = Turn.getInstance();
     }
@@ -23,9 +25,11 @@ public class MouseAction extends MouseAdapter {
     public void mousePressed(MouseEvent mouseEvent) {
         String currentTurn = turn.getTurn();
         String myStoneColor = myStone.getMyStone();
+        int currentPlayerCount = state.getPlayerCount();
+        boolean canGameStart = state.getGameState();
 
-        // 내 턴이 아니면 클릭 방지
-        if (!currentTurn.equals(myStoneColor)) {
+        // 내 턴이 아니거나 플레이어가 모두 준비되지 않았을 경우 클릭 방지
+        if (currentTurn != null && !currentTurn.equals(myStoneColor) || currentPlayerCount != 2 || !canGameStart) {
             return;
         }
 

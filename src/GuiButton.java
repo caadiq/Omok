@@ -7,18 +7,20 @@ public class GuiButton extends JPanel {
     private static final int layoutHeight = 70;
 
     private final Stream stream;
+    private final State state;
     private final MainFrame mainFrame;
     private final MyStone myStone;
+    private final Turn turn;
 
     private final JButton buttonBacksies;
     private final JButton buttonReady;
 
-    private int playerCount = 0;
-
     public GuiButton(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         stream = Stream.getInstance();
+        state = State.getInstance();
         myStone = MyStone.getInstance();
+        turn = Turn.getInstance();
 
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
@@ -29,11 +31,11 @@ public class GuiButton extends JPanel {
         buttonReady.setLocation(0, 0);
         buttonReady.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonReady.addActionListener(e -> {
-            if (playerCount != 2) {
+            if (state.getPlayerCount() != 2) {
                 JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 try {
-                    stream.sendMessage("Ready|" + "Ready");
+                    stream.sendMessage("State|" + "Ready");
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -60,15 +62,14 @@ public class GuiButton extends JPanel {
         add(buttonBacksies);
     }
 
-    public void setPlayerCount(String[] message) {
-        playerCount = Integer.parseInt(message[1]);
+    public void printGameStart() {
+        String color = myStone.getMyStone();
+        String msg = "게임시작! 당신은 " + color + "입니다.";
+        JOptionPane.showMessageDialog(mainFrame, msg, "", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void printGameStart(String[] message) {
-        if (message[1].equals("2")) {
-            String color = myStone.getMyStone();
-            String msg = "게임시작! 당신은 " + color + "입니다.";
-            JOptionPane.showMessageDialog(mainFrame, msg, "", JOptionPane.INFORMATION_MESSAGE);
-        }
+    public void setButtonState() {
+        if (state.getGameState())
+            buttonBacksies.setEnabled(myStone.getMyStone().equals(turn.getTurn()));
     }
 }

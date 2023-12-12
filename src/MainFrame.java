@@ -1,6 +1,4 @@
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 public class MainFrame extends JFrame {
@@ -8,12 +6,14 @@ public class MainFrame extends JFrame {
     private static final int frameHeight = 1000;
 
     private final Stream stream;
+    private final State state;
     private final MyStone myStone;
     private final Turn turn;
 
     public MainFrame() {
         String nickname = Nickname.getInstance().getNickname();
         stream = Stream.getInstance();
+        state = State.getInstance();
         myStone = MyStone.getInstance();
         turn = Turn.getInstance();
 
@@ -46,17 +46,14 @@ public class MainFrame extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-
         Thread shutdownHook = new Thread(() -> { //프로그램 종료시 상대방에게 메세지 보냄
             try {
-                stream.sendMessage("Nicknameout|" + nickname);
+                stream.sendMessage("PlayerExit|" + nickname);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            // 여기에 종료 시 수행하고자 하는 특정 연산을 추가
-            System.out.println("프로그램 종료 혹은 다른 작업 수행");
+            // TODO: 종료 시 수행하고자 하는 특정 연산을 추가
         });
-
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         new Thread(() -> {
@@ -64,14 +61,22 @@ public class MainFrame extends JFrame {
                 try {
                     String[] message = stream.receiveMessage();
                     switch (message[0]) {
-                        case "StonePosition" -> guiBoard.setStone(message);
-                        case "PlayerCount" -> guiButton.setPlayerCount(message);
-                        case "Ready" -> guiButton.printGameStart(message);
+                        case "PlayerCount" -> state.setPlayerCount(Integer.parseInt(message[1]));
+                        case "State" -> {
+                            if (message[1].equals("Start")) {
+                                state.setGameState(true);
+                                guiButton.printGameStart();
+                            }
+                        }
                         case "StoneColor" -> myStone.setMyStone(message[1]);
-                        case "Chat" -> guiChat.setMessage(message);
-                        case "Turn" -> turn.setTurn(message[1]);
-                        case "Nicknamein" -> guiChat.setUserEntered(message);
-                        case "Nicknameout" -> guiChat.setUserOut(message);
+                        case "Turn" -> {
+                            turn.setTurn(message[1]);
+                            guiButton.setButtonState();
+                        }
+                        case "StonePosition" -> guiBoard.setStone(message[1]);
+                        case "Chat" -> guiChat.setMessage(message[1]);
+                        case "PlayerEnter" -> guiChat.setUserEntered(message[1]);
+                        case "PlayerExit" -> guiChat.setUserOut(message[1]);
                         case "Winner" -> {
                             String result;
                             if (message[1].equals(myStone.getMyStone()))
@@ -87,10 +92,5 @@ public class MainFrame extends JFrame {
                 }
             }
         }).start();
-        try {
-            stream.sendMessage("Nicknamein|" + nickname);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
