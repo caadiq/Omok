@@ -3,7 +3,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 
 public class MouseAction extends MouseAdapter {
-    private final GameMethod gameMethod;
+    private GameMethod gameMethod;
     private final GuiBoard guiBoard;
 
     private final Stream stream;
@@ -65,7 +65,6 @@ public class MouseAction extends MouseAdapter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            gameMethod.init();
         }
     }
 }

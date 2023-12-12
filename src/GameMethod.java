@@ -14,7 +14,7 @@ public class GameMethod {
     // 승리 조건
     public boolean endGame(Stone stone) {
         String nowTurn = Turn.getInstance().getTurn();
-        int[][] dir = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { -1, 1 }, { 1, -1 }, { -1, -1 }, { 1, 1 } };
+        int[][] dir = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}};
 
         for (int i = 0; i < 8; i += 2) {
             int stoneLine = 1;
