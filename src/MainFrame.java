@@ -10,6 +10,8 @@ public class MainFrame extends JFrame {
     private final MyStone myStone;
     private final Turn turn;
 
+    private final GameMethod gameMethod;
+
     public MainFrame() {
         String nickname = Nickname.getInstance().getNickname();
         stream = Stream.getInstance();
@@ -28,8 +30,10 @@ public class MainFrame extends JFrame {
         guiButton.setLocation(960, 880);
         add(guiButton);
 
+        gameMethod = new GameMethod();
+
         // 오목판
-        GuiBoard guiBoard = new GuiBoard();
+        GuiBoard guiBoard = new GuiBoard(gameMethod);
         guiBoard.setLocation(10, 10);
         add(guiBoard);
 
@@ -84,6 +88,10 @@ public class MainFrame extends JFrame {
                             else
                                 result = "패배...";
                             JOptionPane.showMessageDialog(this, result, "", JOptionPane.INFORMATION_MESSAGE);
+                            gameMethod.init();
+                            guiBoard.repaint();
+                            guiButton.setbuttonReadyEnable();
+                            state.setGameState(false);
                         }
                     }
                 } catch (Exception e) {

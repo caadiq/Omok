@@ -148,7 +148,9 @@ public class Server {
 
                     if (type[0].equals("State") && type[1].equals("Ready")) {
                         readyCount += 1; // 준비 완료된 플레이어 수 증가
+                        System.out.println("readyCount: "+readyCount);
                         if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
+                            setStone();
                             msg = "State|Start";
                         }
                     } else if (type[0].equals("Turn")) {
@@ -160,6 +162,8 @@ public class Server {
                             msg += "검은색";
                         }
                         System.out.println(msg);
+                    } else if (type[0].equals("Winner")) {
+                        readyCount = 0;
                     }
 
                     msg = msg.trim();
@@ -172,6 +176,9 @@ public class Server {
                         userVector.removeElement(this);
                         detectPlayer();
                         readyCount -= 1;
+                        if(readyCount < 0){
+                            readyCount = 0;
+                        }
                         System.out.println("플레이어 퇴장. 현재 플레이어 수 : " + userVector.size());
                         break;
                     } catch (Exception e2) {
