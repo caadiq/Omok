@@ -46,18 +46,18 @@ public class MainFrame extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        addWindowListener(new WindowAdapter() { // 윈도우가 닫혔을 때, 상대방에게 메세지 전송 뒤 프로그램 종료
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.out.println("프로그램 종료 혹은 다른 작업 수행");
-                try {
-                    stream.sendMessage("Nicknameout|" + nickname);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                System.exit(0); // 프로그램 종료
+
+        Thread shutdownHook = new Thread(() -> { //프로그램 종료시 상대방에게 메세지 보냄
+            try {
+                stream.sendMessage("Nicknameout|" + nickname);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
+            // 여기에 종료 시 수행하고자 하는 특정 연산을 추가
+            System.out.println("프로그램 종료 혹은 다른 작업 수행");
         });
+
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         new Thread(() -> {
             while (true) {
