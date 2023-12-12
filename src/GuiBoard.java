@@ -9,10 +9,10 @@ public class GuiBoard extends JPanel {
     private final int SIZE = 19; // 가로, 세로 선 개수
     private final int STONE_SIZE = 34; // 돌 크기
 
-    private final GameMethod gameMethod;
+    private GameMethod gameMethod;
 
-    public GuiBoard() {
-        gameMethod = new GameMethod();
+    public GuiBoard(GameMethod gameMethod) {
+        this.gameMethod =gameMethod;
 
         setSize(layoutWidth, layoutHeight);
         setLayout(null);

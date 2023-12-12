@@ -44,6 +44,7 @@ public class MouseAction extends MouseAdapter {
 
         // 클릭한 위치에 돌이 이미 놓여져 있는지 확인
         if (!gameMethod.checkStone(y, x)) {
+            System.out.println("돌이 이미 놓여져 있습니다");
             return;
         }
 
@@ -64,6 +65,7 @@ public class MouseAction extends MouseAdapter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            gameMethod.init();
         }
     }
 }

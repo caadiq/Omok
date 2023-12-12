@@ -67,7 +67,9 @@ public class GuiButton extends JPanel {
         String msg = "게임시작! 당신은 " + color + "입니다.";
         JOptionPane.showMessageDialog(mainFrame, msg, "", JOptionPane.INFORMATION_MESSAGE);
     }
-
+    public void setbuttonReadyEnable(){
+        buttonReady.setEnabled(true);
+    }
     public void setButtonState() {
         if (state.getGameState())
             buttonBacksies.setEnabled(myStone.getMyStone().equals(turn.getTurn()));
