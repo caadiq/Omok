@@ -175,9 +175,16 @@ public class Server {
                         clientSocket.close();
                         userVector.removeElement(this);
                         detectPlayer();
-                        if (readyCount >= 0) {
+                        if (readyCount == USER_LIMIT) {
+                            for (UserService userService : userVector) {
+                                userService.WriteOne("Gameover|out");
+                            }
+                            readyCount = 0;
+                        }
+                        if (readyCount > 0) {
                             readyCount--;
                         }
+
                         System.out.println("플레이어 퇴장. 현재 플레이어 수 : " + userVector.size());
                         break;
                     } catch (Exception e2) {

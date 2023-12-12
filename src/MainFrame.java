@@ -93,6 +93,13 @@ public class MainFrame extends JFrame {
                             guiButton.setbuttonReadyEnable();
                             state.setGameState(false);
                         }
+                        case "Gameover" -> {
+                            JOptionPane.showMessageDialog(this, "상대방이 나갔습니다", "", JOptionPane.INFORMATION_MESSAGE);
+                            gameMethod.init();
+                            guiBoard.repaint();
+                            guiButton.setbuttonReadyEnable();
+                            state.setGameState(false);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
