@@ -1,12 +1,18 @@
 import javax.swing.*;
 
-class MainFrame extends JFrame {
+public class MainFrame extends JFrame {
     private static final int frameWidth = 1360;
     private static final int frameHeight = 1000;
 
-    private final Stream stream = Stream.getInstance();
+    private final Stream stream;
+    private final MyStone myStone;
+    private final Turn turn;
 
     public MainFrame() {
+        stream = Stream.getInstance();
+        myStone = MyStone.getInstance();
+        turn = Turn.getInstance();
+
         setTitle("오목");
         setSize(frameWidth, frameHeight);
         setResizable(false); // 창 크기 변경 방지
@@ -19,7 +25,7 @@ class MainFrame extends JFrame {
         add(guiButton);
 
         // 오목판
-        GuiBoard guiBoard = new GuiBoard(this,guiButton);
+        GuiBoard guiBoard = new GuiBoard();
         guiBoard.setLocation(10, 10);
         add(guiBoard);
 
@@ -41,10 +47,20 @@ class MainFrame extends JFrame {
                 try {
                     String[] message = stream.receiveMessage();
                     switch (message[0]) {
-                        case "Chat" -> guiChat.setMessage(message);
+                        case "StonePosition" -> guiBoard.setStone(message);
+                        case "PlayerCount" -> guiButton.setPlayerCount(message);
                         case "Ready" -> guiButton.printGameStart(message);
-                        case "numbercheck" -> guiButton.canGameStart(message);
-                        case "Stone" -> guiBoard.getStone(message);
+                        case "StoneColor" -> myStone.setMyStone(message[1]);
+                        case "Chat" -> guiChat.setMessage(message);
+                        case "Turn" -> turn.setTurn(message[1]);
+                        case "Winner" -> {
+                            String result;
+                            if (message[1].equals(myStone.getMyStone()))
+                                result = "승리!";
+                            else
+                                result = "패배...";
+                            JOptionPane.showMessageDialog(this, result, "", JOptionPane.INFORMATION_MESSAGE);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -52,12 +68,5 @@ class MainFrame extends JFrame {
                 }
             }
         }).start();
-    }
-
-}
-
-public class Main {
-    public static void main(String[] args) {
-        new MainFrame();
     }
 }

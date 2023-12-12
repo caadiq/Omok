@@ -4,11 +4,15 @@ import java.io.IOException;
 
 public class GuiChat extends JPanel {
     private static final int layoutWidth = 380;
-    private static final int layoutHeight = 430;
-    private final Stream stream = Stream.getInstance();
-    private JTextArea textArea;
+    private static final int layoutHeight = 470;
+
+    private final Stream stream;
+
+    private final JTextArea textArea;
 
     public GuiChat() {
+        stream = Stream.getInstance();
+
         setLayout(new BorderLayout());
         setSize(layoutWidth, layoutHeight);
 
@@ -21,7 +25,6 @@ public class GuiChat extends JPanel {
         JTextField textField = new JTextField();
         textField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         textField.setFont(new Font("Dialog", Font.PLAIN, 18));
-
         textField.addActionListener(event -> {
             String strTextField = textField.getText();
             String nickname = Nickname.getInstance().getNickname();
@@ -41,9 +44,8 @@ public class GuiChat extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
         add(textField, BorderLayout.SOUTH);
     }
+
     public void setMessage(String[] message) {
         SwingUtilities.invokeLater(() -> textArea.append(message[1] + "\n"));
     }
-
-
 }
