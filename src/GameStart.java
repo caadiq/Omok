@@ -7,9 +7,13 @@ public class GameStart extends JFrame {
     private static final int frameWidth = 500;
     private static final int frameHeight = 120;
 
+    private final Stream stream;
+
     private final JTextField textField;
 
     public GameStart() {
+        stream = Stream.getInstance();
+
         setTitle("오목");
         setSize(frameWidth, frameHeight);
         setResizable(false);
@@ -45,13 +49,13 @@ public class GameStart extends JFrame {
             JOptionPane.showMessageDialog(this, "닉네임을 입력해주세요.");
         } else {
             try {
-                String[] message = Stream.getInstance().receiveMessage();
+                String[] message = stream.receiveMessage();
                 if (message[0].equals("Room")) {
                     String roomState = message[1];
                     if (roomState.equals("입장가능")) {
-                        Nickname.getInstance().setNickname(nickname);
+                        Player.getInstance().setNickname(nickname);
                         try {
-                            Stream.getInstance().sendMessage("PlayerEnter|" + nickname);
+                            stream.sendMessage("PlayerEnter|" + nickname);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

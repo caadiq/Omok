@@ -6,10 +6,10 @@ public class GuiButton extends JPanel {
     private static final int layoutWidth = 375;
     private static final int layoutHeight = 70;
 
-    private final Stream stream;
-    private final State state;
     private final MainFrame mainFrame;
-    private final MyStone myStone;
+    private final Stream stream;
+    private final Player player;
+    private final State state;
     private final Turn turn;
 
     private final JButton buttonBacksies;
@@ -18,8 +18,8 @@ public class GuiButton extends JPanel {
     public GuiButton(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         stream = Stream.getInstance();
+        player = Player.getInstance();
         state = State.getInstance();
-        myStone = MyStone.getInstance();
         turn = Turn.getInstance();
 
         setSize(layoutWidth, layoutHeight);
@@ -63,7 +63,7 @@ public class GuiButton extends JPanel {
     }
 
     public void printGameStart() {
-        String color = myStone.getMyStone();
+        String color = player.getMyStone();
         String msg = "게임시작! 당신은 " + color + "입니다.";
         JOptionPane.showMessageDialog(mainFrame, msg, "", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -72,6 +72,6 @@ public class GuiButton extends JPanel {
     }
     public void setButtonState() {
         if (state.getGameState())
-            buttonBacksies.setEnabled(myStone.getMyStone().equals(turn.getTurn()));
+            buttonBacksies.setEnabled(player.getMyStone().equals(turn.getTurn()));
     }
 }

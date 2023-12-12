@@ -64,6 +64,27 @@ public class Server {
         }
     }
 
+    public void setCharacter() {
+        List<String> characters = new ArrayList<>();
+        characters.add("sangsang_bugi");
+        characters.add("hansung_nyangi");
+        characters.add("ggoggo");
+        characters.add("gguggu");
+        characters.add("sangjji");
+        Collections.shuffle(characters); // 리스트 섞기
+
+        String character1 = characters.get(0);
+        String character2 = characters.get(1);
+
+        String player1 = "Character|" + character1 + "," + character2;
+        String player2 = "Character|" + character2 + "," + character1;
+
+        UserService user1 = userVector.get(0);
+        user1.WriteOne(player1);
+        UserService user2 = userVector.get(1);
+        user2.WriteOne(player2);
+    }
+
     class AcceptServer extends Thread {
         public void run() {
             while (true) {
@@ -78,11 +99,6 @@ public class Server {
                         detectPlayer();
                     } else {
                         clientSocket.close();
-                    }
-
-                    // 플레이어 2명이 모두 접속
-                    if (userVector.size() == USER_LIMIT) {
-                        setStone();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -151,6 +167,7 @@ public class Server {
                         System.out.println("readyCount: " + readyCount);
                         if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
                             setStone();
+                            setCharacter();
                             msg = "State|Start";
                         }
                     } else if (type[0].equals("Turn")) {

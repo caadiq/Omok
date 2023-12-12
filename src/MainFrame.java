@@ -6,17 +6,16 @@ public class MainFrame extends JFrame {
     private static final int frameHeight = 1000;
 
     private final Stream stream;
+    private final Player player;
     private final State state;
-    private final MyStone myStone;
     private final Turn turn;
 
     private final GameMethod gameMethod;
 
     public MainFrame() {
-        String nickname = Nickname.getInstance().getNickname();
         stream = Stream.getInstance();
+        player = Player.getInstance();
         state = State.getInstance();
-        myStone = MyStone.getInstance();
         turn = Turn.getInstance();
 
         setTitle("오목");
@@ -52,7 +51,7 @@ public class MainFrame extends JFrame {
 
         Thread shutdownHook = new Thread(() -> { //프로그램 종료시 상대방에게 메세지 보냄
             try {
-                stream.sendMessage("PlayerExit|" + nickname);
+                stream.sendMessage("PlayerExit|" + player.getNickname());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -72,18 +71,26 @@ public class MainFrame extends JFrame {
                                 guiButton.printGameStart();
                             }
                         }
-                        case "StoneColor" -> myStone.setMyStone(message[1]);
+                        case "StoneColor" -> player.setMyStone(message[1]);
                         case "Turn" -> {
                             turn.setTurn(message[1]);
                             guiButton.setButtonState();
+                            guiPlayer.setBorder();
                         }
                         case "StonePosition" -> guiBoard.setStone(message[1]);
+                        case "Character" -> {
+                            String[] character = message[1].split(",");
+                            player.setMyCharacter(character[0]);
+                            player.setOpponentCharacter(character[1]);
+                            guiPlayer.setCharacter();
+                            System.out.println("c0 : " + character[0] + ", c1 : " + character[1]);
+                        }
                         case "Chat" -> guiChat.setMessage(message[1]);
                         case "PlayerEnter" -> guiChat.setUserEntered(message[1]);
                         case "PlayerExit" -> guiChat.setUserOut(message[1]);
                         case "Winner" -> {
                             String result;
-                            if (message[1].equals(myStone.getMyStone()))
+                            if (message[1].equals(player.getMyStone()))
                                 result = "승리!";
                             else
                                 result = "패배...";
