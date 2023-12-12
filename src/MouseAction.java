@@ -14,7 +14,7 @@ public class MouseAction extends MouseAdapter {
         this.gameMethod = gameMethod;
         this.guiBoard = guiBoard;
 
-        stream  = Stream.getInstance();
+        stream = Stream.getInstance();
         myStone = MyStone.getInstance();
         turn = Turn.getInstance();
     }
