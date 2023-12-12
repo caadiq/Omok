@@ -43,10 +43,4 @@ public class Stream {
     public String[] receiveMessage() throws IOException {
         return inputStream.readUTF().trim().split("\\|");
     }
-
-    public void close() throws IOException {
-        inputStream.close();
-        outputStream.close();
-        socket.close();
-    }
 }

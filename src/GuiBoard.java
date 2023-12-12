@@ -91,8 +91,8 @@ public class GuiBoard extends JPanel {
     }
 
     // 상대방 돌 놓기
-    public void setStone(String[] message) {
-        String[] stonePosition = message[1].trim().split(",");
+    public void setStone(String message) {
+        String[] stonePosition = message.trim().split(",");
 
         int y = Integer.parseInt(stonePosition[0]);
         int x = Integer.parseInt(stonePosition[1]);

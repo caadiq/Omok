@@ -20,7 +20,9 @@ public class GuiChat extends JPanel {
         textArea.setEditable(false);
         textArea.setFocusable(false);
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        textArea.setFont(new Font("Dialog", Font.PLAIN, 18));
+        textArea.setFont(new Font("Dialog", Font.PLAIN, 16));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
 
         JTextField textField = new JTextField();
         textField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
@@ -45,15 +47,15 @@ public class GuiChat extends JPanel {
         add(textField, BorderLayout.SOUTH);
     }
 
-    public void setMessage(String[] message) {
-        SwingUtilities.invokeLater(() -> textArea.append(message[1] + "\n"));
+    public void setMessage(String message) {
+        SwingUtilities.invokeLater(() -> textArea.append(message + "\n"));
     }
 
-    public void setUserEntered(String[] message) {
-        SwingUtilities.invokeLater(() -> textArea.append(message[1] + "님이 입장하셨습니다" + "\n"));
+    public void setUserEntered(String message) {
+        SwingUtilities.invokeLater(() -> textArea.append(message + "님이 입장하셨습니다" + "\n"));
     }
 
-    public void setUserOut(String[] message) {
-        SwingUtilities.invokeLater(() -> textArea.append(message[1] + "님이 퇴장하셨습니다" + "\n"));
+    public void setUserOut(String message) {
+        SwingUtilities.invokeLater(() -> textArea.append(message + "님이 퇴장하셨습니다" + "\n"));
     }
 }

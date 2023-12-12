@@ -10,7 +10,7 @@ public class GameStart extends JFrame {
     private final JTextField textField;
 
     public GameStart() {
-        setTitle("윷놀이");
+        setTitle("오목");
         setSize(frameWidth, frameHeight);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -50,10 +50,16 @@ public class GameStart extends JFrame {
                     String roomState = message[1];
                     if (roomState.equals("입장가능")) {
                         Nickname.getInstance().setNickname(nickname);
+                        try {
+                            Stream.getInstance().sendMessage("PlayerEnter|" + nickname);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
                         SwingUtilities.invokeLater(MainFrame::new);
                         this.dispose();
                     } else if (roomState.equals("입장불가능")) {
-                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "방이 꽉찼습니다."));
+                        JOptionPane.showMessageDialog(this, "방이 꽉찼습니다.", "", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             } catch (IOException e) {

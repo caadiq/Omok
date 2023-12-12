@@ -80,7 +80,7 @@ public class Server {
                         clientSocket.close();
                     }
 
-                    // 플레이어가 모두 접속하면 돌 설정
+                    // 플레이어 2명이 모두 접속
                     if (userVector.size() == USER_LIMIT) {
                         setStone();
                     }
@@ -146,9 +146,11 @@ public class Server {
                     String msg = dataInputStream.readUTF();
                     String[] type = msg.trim().split("\\|");
 
-                    if (type[0].equals("Ready")) {
+                    if (type[0].equals("State") && type[1].equals("Ready")) {
                         readyCount += 1; // 준비 완료된 플레이어 수 증가
-                        msg = "Ready|" + readyCount;
+                        if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
+                            msg = "State|Start";
+                        }
                     } else if (type[0].equals("Turn")) {
                         msg = "Turn|";
                         // 현재 턴이 검은색이면 흰색으로 바꾸고 흰색이라면 검은색으로 변경
