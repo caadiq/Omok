@@ -95,7 +95,7 @@ public class Server {
         private InputStream inputStream;
         private OutputStream outputStream;
         private DataInputStream dataInputStream;
-        public DataOutputStream dataOutputStream;
+        private DataOutputStream dataOutputStream;
 
         public UserService(Socket clientSocket) {
             try {
