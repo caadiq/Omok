@@ -29,7 +29,7 @@ public class GuiChat extends JPanel {
         textField.setFont(new Font("Dialog", Font.PLAIN, 18));
         textField.addActionListener(event -> {
             String strTextField = textField.getText();
-            String nickname = Nickname.getInstance().getNickname();
+            String nickname = Player.getInstance().getNickname();
 
             try {
                 stream.sendMessage("Chat|" + nickname + " : " + strTextField);

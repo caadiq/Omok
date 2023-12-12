@@ -3,12 +3,11 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 
 public class MouseAction extends MouseAdapter {
-    private GameMethod gameMethod;
+    private final GameMethod gameMethod;
     private final GuiBoard guiBoard;
-
     private final Stream stream;
+    private final Player player;
     private final State state;
-    private final MyStone myStone;
     private final Turn turn;
 
     public MouseAction(GameMethod gameMethod, GuiBoard guiBoard) {
@@ -16,15 +15,15 @@ public class MouseAction extends MouseAdapter {
         this.guiBoard = guiBoard;
 
         stream = Stream.getInstance();
+        player = Player.getInstance();
         state = State.getInstance();
-        myStone = MyStone.getInstance();
         turn = Turn.getInstance();
     }
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
         String currentTurn = turn.getTurn();
-        String myStoneColor = myStone.getMyStone();
+        String myStoneColor = player.getMyStone();
         int currentPlayerCount = state.getPlayerCount();
         boolean canGameStart = state.getGameState();
 
