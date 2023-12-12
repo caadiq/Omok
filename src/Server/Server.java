@@ -147,7 +147,7 @@ public class Server {
                     String[] type = msg.trim().split("\\|");
 
                     if (type[0].equals("State") && type[1].equals("Ready")) {
-                        readyCount += 1; // 준비 완료된 플레이어 수 증가
+                        readyCount++; // 준비 완료된 플레이어 수 증가
                         System.out.println("readyCount: " + readyCount);
                         if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
                             setStone();
@@ -175,9 +175,8 @@ public class Server {
                         clientSocket.close();
                         userVector.removeElement(this);
                         detectPlayer();
-                        readyCount -= 1;
-                        if (readyCount < 0) {
-                            readyCount = 0;
+                        if (readyCount >= 0) {
+                            readyCount--;
                         }
                         System.out.println("플레이어 퇴장. 현재 플레이어 수 : " + userVector.size());
                         break;
