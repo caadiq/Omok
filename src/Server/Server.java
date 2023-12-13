@@ -43,15 +43,10 @@ public class Server {
         acceptServer.start();
     }
 
+    // 모든 클라이언트에게 메시지 전송
     public void sendMessageToClient(String message) {
         for (UserService user : userVector) {
             user.WriteOne(message);
-        }
-    }
-
-    private void sendTimeToClient(int timeLeft) {
-        for (UserService user : userVector) {
-            user.WriteOne("Timer|" + timeLeft);
         }
     }
 
@@ -119,6 +114,7 @@ public class Server {
         startTimer();
     }
 
+    // 타이머 시작
     public void startTimer() {
         if (timer != null) {
             timer.cancel(); // 현재 타이머가 있으면 취소
@@ -130,9 +126,8 @@ public class Server {
             @Override
             public void run() {
                 timeLeft--;
-                if (timeLeft > 0) {
-                    sendTimeToClient(timeLeft);
-                } else {
+                sendMessageToClient("Timer|" + timeLeft);
+                if (timeLeft <= 0) {
                     timer.cancel();
                     switchTurn(currentTurn);
                 }
@@ -219,7 +214,7 @@ public class Server {
 
                     if (type[0].equals("State") && type[1].equals("Ready")) {
                         readyCount++; // 준비 완료된 플레이어 수 증가
-                        System.out.println("readyCount: " + readyCount);
+                        System.out.println("준비 완료 : " + readyCount + "명");
                         if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
                             startGame();
                         }

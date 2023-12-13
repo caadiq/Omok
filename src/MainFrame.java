@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 
 public class MainFrame extends JFrame {
@@ -79,7 +78,7 @@ public class MainFrame extends JFrame {
                         case "StoneColor" -> player.setMyStone(message[1]);
                         case "Turn" -> {
                             turn.setTurn(message[1]);
-                            guiButton.setButtonState();
+                            guiButton.setButtonBacksiesState();
                             guiPlayer.setBorder();
                         }
                         case "StonePosition" -> guiBoard.setStone(message[1]);
@@ -102,14 +101,18 @@ public class MainFrame extends JFrame {
                             JOptionPane.showMessageDialog(this, result, "", JOptionPane.INFORMATION_MESSAGE);
                             gameMethod.init();
                             guiBoard.repaint();
+                            guiPlayer.resetCharacter();
                             guiButton.setbuttonReadyEnable();
+                            guiButton.setButtonBacksiesDisable();
                             state.setGameState(false);
                         }
                         case "Gameover" -> {
                             JOptionPane.showMessageDialog(this, "상대방이 나갔습니다", "", JOptionPane.INFORMATION_MESSAGE);
                             gameMethod.init();
                             guiBoard.repaint();
+                            guiPlayer.resetCharacter();
                             guiButton.setbuttonReadyEnable();
+                            guiButton.setButtonBacksiesDisable();
                             state.setGameState(false);
                         }
                     }
