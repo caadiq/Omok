@@ -65,4 +65,12 @@ public class GuiPlayer extends JPanel {
             opCharacter.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         }
     }
+
+    public void resetCharacter() {
+        myCharacter.setIcon(null);
+        myCharacter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        opCharacter.setIcon(null);
+        opCharacter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+    }
 }
