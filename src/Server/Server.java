@@ -4,10 +4,8 @@ import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Vector;
 
 public class Server {
     private static final int SERVER_PORT = 10000;
@@ -18,7 +16,11 @@ public class Server {
 
     private final Vector<UserService> userVector = new Vector<>();
 
-    public int readyCount = 0;
+    private int readyCount = 0;
+    private String currentTurn = "검은색";
+
+    private Timer timer;
+    private final int timeLimit = 30;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -41,12 +43,30 @@ public class Server {
         acceptServer.start();
     }
 
+    public void sendMessageToClient(String message) {
+        for (UserService user : userVector) {
+            user.WriteOne(message);
+        }
+    }
+
+    private void sendTimeToClient(int timeLeft) {
+        for (UserService user : userVector) {
+            user.WriteOne("Timer|" + timeLeft);
+        }
+    }
+
     // 플레이어 감지
     public void detectPlayer() {
         // 현재 플레이어 수를 모든 유저에게 전송
-        for (UserService userService : userVector) {
-            userService.WriteOne("PlayerCount|" + userVector.size());
-        }
+        sendMessageToClient("PlayerCount|" + userVector.size());
+    }
+
+    // 게임 시작
+    public void startGame() {
+        setStone();
+        setCharacter();
+        sendMessageToClient("State|Start");
+        startTimer();
     }
 
     // 흑돌, 백돌 랜덤으로 정하기
@@ -64,6 +84,7 @@ public class Server {
         }
     }
 
+    // 각 플레이어에게 캐릭터 랜덤으로 부여하기
     public void setCharacter() {
         List<String> characters = new ArrayList<>();
         characters.add("sangsang_bugi");
@@ -83,6 +104,40 @@ public class Server {
         user1.WriteOne(player1);
         UserService user2 = userVector.get(1);
         user2.WriteOne(player2);
+    }
+
+    // 턴 전환
+    public void switchTurn(String turn) {
+        timer.cancel();
+        if (turn.equals("검은색")) {
+            sendMessageToClient("Turn|흰색");
+            currentTurn = "흰색";
+        } else if (turn.equals("흰색")) {
+            sendMessageToClient("Turn|검은색");
+            currentTurn = "검은색";
+        }
+        startTimer();
+    }
+
+    public void startTimer() {
+        if (timer != null) {
+            timer.cancel(); // 현재 타이머가 있으면 취소
+        }
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int timeLeft = timeLimit;
+
+            @Override
+            public void run() {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    sendTimeToClient(timeLeft);
+                } else {
+                    timer.cancel();
+                    switchTurn(currentTurn);
+                }
+            }
+        }, 0, 1000);
     }
 
     class AcceptServer extends Thread {
@@ -159,32 +214,26 @@ public class Server {
         public void run() {
             while (true) {
                 try {
-                    String msg = dataInputStream.readUTF();
-                    String[] type = msg.trim().split("\\|");
+                    String msg = dataInputStream.readUTF().trim();
+                    String[] type = msg.split("\\|");
 
                     if (type[0].equals("State") && type[1].equals("Ready")) {
                         readyCount++; // 준비 완료된 플레이어 수 증가
                         System.out.println("readyCount: " + readyCount);
                         if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
-                            setStone();
-                            setCharacter();
-                            msg = "State|Start";
+                            startGame();
                         }
+                        WriteAll(msg + "\n");
                     } else if (type[0].equals("Turn")) {
-                        msg = "Turn|";
-                        // 현재 턴이 검은색이면 흰색으로 바꾸고 흰색이라면 검은색으로 변경
-                        if (type[1].equals("검은색")) {
-                            msg += "흰색";
-                        } else if (type[1].equals("흰색")) {
-                            msg += "검은색";
-                        }
-                        System.out.println(msg);
+                        currentTurn = type[1];
+                        switchTurn(currentTurn);
                     } else if (type[0].equals("Winner")) {
                         readyCount = 0;
+                        timer.cancel();
+                        WriteAll(msg + "\n");
+                    } else {
+                        WriteAll(msg + "\n");
                     }
-
-                    msg = msg.trim();
-                    WriteAll(msg + "\n");
                 } catch (IOException e1) {
                     try {
                         dataOutputStream.close();
@@ -197,6 +246,7 @@ public class Server {
                                 userService.WriteOne("Gameover|out");
                             }
                             readyCount = 0;
+                            timer.cancel();
                         }
                         if (readyCount > 0) {
                             readyCount--;
