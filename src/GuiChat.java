@@ -3,8 +3,8 @@ import java.awt.*;
 import java.io.IOException;
 
 public class GuiChat extends JPanel {
-    private static final int layoutWidth = 380;
-    private static final int layoutHeight = 470;
+    private static final int layoutWidth = 375;
+    private static final int layoutHeight = 580;
 
     private final Stream stream;
 
@@ -13,8 +13,8 @@ public class GuiChat extends JPanel {
     public GuiChat() {
         stream = Stream.getInstance();
 
-        setLayout(new BorderLayout());
         setSize(layoutWidth, layoutHeight);
+        setLayout(null);
 
         textArea = new JTextArea();
         textArea.setEditable(false);
@@ -24,7 +24,14 @@ public class GuiChat extends JPanel {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
 
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setSize(375, 524);
+        scrollPane.setLocation(0, 0);
+        add(scrollPane);
+
         JTextField textField = new JTextField();
+        textField.setSize(375, 50);
+        textField.setLocation(0, 529);
         textField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         textField.setFont(new Font("Dialog", Font.PLAIN, 18));
         textField.addActionListener(event -> {
@@ -41,10 +48,7 @@ public class GuiChat extends JPanel {
             textArea.setCaretPosition(textArea.getDocument().getLength());
             textField.setText(null);
         });
-
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        add(scrollPane, BorderLayout.CENTER);
-        add(textField, BorderLayout.SOUTH);
+        add(textField);
     }
 
     public void setMessage(String message) {

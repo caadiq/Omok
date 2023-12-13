@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 public class MainFrame extends JFrame {
@@ -41,9 +42,13 @@ public class MainFrame extends JFrame {
         guiPlayer.setLocation(960, 10);
         add(guiPlayer);
 
+        GuiTimer guiTimer = new GuiTimer();
+        guiTimer.setLocation(960, 240);
+        add(guiTimer);
+
         // 채팅
         GuiChat guiChat = new GuiChat();
-        guiChat.setLocation(960, 400);
+        guiChat.setLocation(960, 290);
         add(guiChat);
 
         setVisible(true);
@@ -83,8 +88,8 @@ public class MainFrame extends JFrame {
                             player.setMyCharacter(character[0]);
                             player.setOpponentCharacter(character[1]);
                             guiPlayer.setCharacter();
-                            System.out.println("c0 : " + character[0] + ", c1 : " + character[1]);
                         }
+                        case "Timer" -> guiTimer.setTimer(message[1]);
                         case "Chat" -> guiChat.setMessage(message[1]);
                         case "PlayerEnter" -> guiChat.setUserEntered(message[1]);
                         case "PlayerExit" -> guiChat.setUserOut(message[1]);
