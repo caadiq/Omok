@@ -9,10 +9,12 @@ public class GuiBoard extends JPanel {
     private final int SIZE = 19; // 가로, 세로 선 개수
     private final int STONE_SIZE = 34; // 돌 크기
 
-    private GameMethod gameMethod;
+    private final GameMethod gameMethod;
+    private final Player player;
 
     public GuiBoard(GameMethod gameMethod) {
         this.gameMethod = gameMethod;
+        player = Player.getInstance();
 
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
@@ -90,18 +92,36 @@ public class GuiBoard extends JPanel {
         graphics.fillOval(x * CELL + 30, y * CELL + 30, STONE_SIZE, STONE_SIZE);
     }
 
-    // 상대방 돌 놓기
+    // 돌 놓기
+    private void putStone(int y, int x, String stoneColor) {
+        gameMethod.putStone(new Stone(y, x, stoneColor));
+        repaint();
+    }
+
+    // 돌 상태 가져오기
     public void setStone(String message) {
-        String[] stonePosition = message.trim().split(",");
+        String[] stonePosition = message.split(",");
 
         int y = Integer.parseInt(stonePosition[0]);
         int x = Integer.parseInt(stonePosition[1]);
         String stoneColor = stonePosition[2];
 
-        System.out.println("x : " + x + ", y : " + y + ", color : " + stoneColor);
+        putStone(y, x, stoneColor);
+    }
 
-        gameMethod.putStone(new Stone(y, x, stoneColor));
+    // 무르기 돌 상태 가져오기
+    public void returnStone(String message) {
+        String[] stonePosition = message.split(",");
 
-        repaint();
+        int y = Integer.parseInt(stonePosition[0]);
+        int x = Integer.parseInt(stonePosition[1]);
+        String turn = stonePosition[2];
+
+        putStone(y, x, null);
+
+        if (!player.getMyStone().equals(turn))
+            JOptionPane.showMessageDialog(this, "상대방이 무르기를 사용했습니다.\n상대방에게 턴이 넘어갑니다.", "", JOptionPane.INFORMATION_MESSAGE);
+        else
+            JOptionPane.showMessageDialog(this, "무르기를 사용했습니다.\n남은 무르기 횟수는 0입니다.", "", JOptionPane.INFORMATION_MESSAGE);
     }
 }

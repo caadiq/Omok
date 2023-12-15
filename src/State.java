@@ -1,6 +1,7 @@
 public class State {
     private int playerCount = 0;
     private boolean gameState;
+    private boolean previousTurnReturned;
 
     private static class StateHolder {
         private static final State INSTANCE = new State();
@@ -24,5 +25,13 @@ public class State {
 
     public void setGameState(boolean gameState) {
         this.gameState = gameState;
+    }
+
+    public boolean getPreviousTurnReturned() {
+        return previousTurnReturned;
+    }
+
+    public void setPreviousTurnReturned(boolean previousTurnReturned) {
+        this.previousTurnReturned = previousTurnReturned;
     }
 }

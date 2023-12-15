@@ -45,6 +45,34 @@ public class GuiPlayer extends JPanel {
         add(opLabel);
     }
 
+    @Override
+    public void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+
+        String myStone = player.getMyStone();
+
+        // 캐릭터 옆에 돌 그리기
+        if (myStone != null) {
+            String opStone = myStone.equals("검은색") ? "흰색" : "검은색";
+            drawStone(graphics, 140, 140, myStone);
+            drawStone(graphics, 340, 140, opStone);
+        }
+    }
+
+    // 돌 그리기
+    private void drawStone(Graphics graphics, int x, int y, String stoneColor) {
+        int stoneSize = 28;
+        Color color = stoneColor.equals("검은색") ? Color.BLACK : Color.WHITE;
+
+        graphics.setColor(color);
+        graphics.fillOval(x, y, stoneSize, stoneSize);
+
+        if (color == Color.WHITE) {
+            graphics.setColor(Color.BLACK);
+            graphics.drawOval(x, y, stoneSize, stoneSize);
+        }
+    }
+
     private ImageIcon setImage(String image) {
         ImageIcon originalImage = new ImageIcon("images/" + image + ".png");
         Image scaledImage = originalImage.getImage().getScaledInstance(imageLength, imageLength, Image.SCALE_SMOOTH);

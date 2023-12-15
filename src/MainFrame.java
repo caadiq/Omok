@@ -107,13 +107,24 @@ public class MainFrame extends JFrame {
                             state.setGameState(false);
                         }
                         case "Gameover" -> {
-                            JOptionPane.showMessageDialog(this, "상대방이 나갔습니다", "", JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(this, "상대방이 나가서\n게임이 종료됩니다.", "", JOptionPane.INFORMATION_MESSAGE);
                             gameMethod.init();
                             guiBoard.repaint();
                             guiPlayer.resetCharacter();
                             guiButton.setbuttonReadyEnable();
                             guiButton.setButtonBacksiesDisable();
                             state.setGameState(false);
+                        }
+                        case "Return" -> guiBoard.returnStone(message[1]);
+                        case "CanReturn" -> {
+                            String[] canReturn = message[1].split(",");
+                            if (player.getMyStone().equals(canReturn[0])) {
+                                player.setCanReturn(Boolean.parseBoolean(canReturn[1]));
+                            }
+                        }
+                        case "PreviousTurnReturned" -> {
+                            state.setPreviousTurnReturned(Boolean.parseBoolean(message[1]));
+                            guiButton.setButtonBacksiesState();
                         }
                     }
                 } catch (Exception e) {

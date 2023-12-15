@@ -18,9 +18,13 @@ public class Server {
 
     private int readyCount = 0;
     private String currentTurn = "검은색";
+    private String stonePosition;
+    private boolean canBlackReturn = true;
+    private boolean canWhiteReturn = true;
+    private boolean previousTurnReturned = false;
 
     private Timer timer;
-    private final int timeLimit = 30;
+    private final int timeLimit = 30; // 타이머 30초
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -44,28 +48,33 @@ public class Server {
     }
 
     // 모든 클라이언트에게 메시지 전송
-    public void sendMessageToClient(String message) {
+    private void sendMessageToClient(String message) {
         for (UserService user : userVector) {
             user.WriteOne(message);
         }
     }
 
     // 플레이어 감지
-    public void detectPlayer() {
+    private void detectPlayer() {
         // 현재 플레이어 수를 모든 유저에게 전송
         sendMessageToClient("PlayerCount|" + userVector.size());
     }
 
     // 게임 시작
-    public void startGame() {
+    private void startGame() {
         setStone();
         setCharacter();
         sendMessageToClient("State|Start");
+        sendMessageToClient("CanReturn|검은색,true");
+        sendMessageToClient("CanReturn|흰색,true");
+        canWhiteReturn = true;
+        canBlackReturn = true;
+        previousTurnReturned = false;
         startTimer();
     }
 
     // 흑돌, 백돌 랜덤으로 정하기
-    public void setStone() {
+    private void setStone() {
         List<String> stones = new ArrayList<>();
         stones.add("검은색");
         stones.add("흰색");
@@ -80,7 +89,7 @@ public class Server {
     }
 
     // 각 플레이어에게 캐릭터 랜덤으로 부여하기
-    public void setCharacter() {
+    private void setCharacter() {
         List<String> characters = new ArrayList<>();
         characters.add("sangsang_bugi");
         characters.add("hansung_nyangi");
@@ -102,20 +111,40 @@ public class Server {
     }
 
     // 턴 전환
-    public void switchTurn(String turn) {
+    private void switchTurn(String turn, boolean isReturned) {
         timer.cancel();
+        previousTurnReturned = isReturned;
+
         if (turn.equals("검은색")) {
-            sendMessageToClient("Turn|흰색");
             currentTurn = "흰색";
         } else if (turn.equals("흰색")) {
-            sendMessageToClient("Turn|검은색");
             currentTurn = "검은색";
         }
+
+        sendMessageToClient("Turn|" + currentTurn);
+        sendMessageToClient("PreviousTurnReturned|" + previousTurnReturned);
         startTimer();
     }
 
+    // 무르기
+    private void returnStone(String stone) {
+        if (!stone.equals(currentTurn)) {
+            if (stone.equals("검은색") && canBlackReturn) {
+                canBlackReturn = false;
+                sendMessageToClient("Return|" + stonePosition);
+                sendMessageToClient("CanReturn|검은색,false");
+                switchTurn("흰색", true);
+            } else if (stone.equals("흰색") && canWhiteReturn) {
+                canWhiteReturn = false;
+                sendMessageToClient("Return|" + stonePosition);
+                sendMessageToClient("CanReturn|흰색,false");
+                switchTurn("검은색", true);
+            }
+        }
+    }
+
     // 타이머 시작
-    public void startTimer() {
+    private void startTimer() {
         if (timer != null) {
             timer.cancel(); // 현재 타이머가 있으면 취소
         }
@@ -129,7 +158,7 @@ public class Server {
                 sendMessageToClient("Timer|" + timeLeft);
                 if (timeLeft <= 0) {
                     timer.cancel();
-                    switchTurn(currentTurn);
+                    switchTurn(currentTurn, previousTurnReturned);
                 }
             }
         }, 0, 1000);
@@ -212,22 +241,32 @@ public class Server {
                     String msg = dataInputStream.readUTF().trim();
                     String[] type = msg.split("\\|");
 
-                    if (type[0].equals("State") && type[1].equals("Ready")) {
-                        readyCount++; // 준비 완료된 플레이어 수 증가
-                        System.out.println("준비 완료 : " + readyCount + "명");
-                        if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
-                            startGame();
+                    switch(type[0]) {
+                        case "State" -> {
+                            if (type[1].equals("Ready")) {
+                                readyCount++; // 준비 완료된 플레이어 수 증가
+                                System.out.println("준비 완료 : " + readyCount + "명");
+                                if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
+                                    startGame();
+                                }
+                                WriteAll(msg);
+                            }
                         }
-                        WriteAll(msg + "\n");
-                    } else if (type[0].equals("Turn")) {
-                        currentTurn = type[1];
-                        switchTurn(currentTurn);
-                    } else if (type[0].equals("Winner")) {
-                        readyCount = 0;
-                        timer.cancel();
-                        WriteAll(msg + "\n");
-                    } else {
-                        WriteAll(msg + "\n");
+                        case "Turn" -> {
+                            currentTurn = type[1];
+                            switchTurn(currentTurn, false);
+                        }
+                        case "Winner" -> {
+                            readyCount = 0;
+                            timer.cancel();
+                            WriteAll(msg);
+                        }
+                        case "StonePosition" -> {
+                            stonePosition = type[1];
+                            WriteAll(msg);
+                        }
+                        case "Return" -> returnStone(type[1]);
+                        default -> WriteAll(msg + "\n");
                     }
                 } catch (IOException e1) {
                     try {

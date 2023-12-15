@@ -30,7 +30,7 @@ public class GuiButton extends JPanel {
         buttonReady.setSize(180, 70);
         buttonReady.setLocation(0, 0);
         buttonReady.setFont(new Font("Dialog", Font.BOLD, 22));
-        buttonReady.addActionListener(e -> {
+        buttonReady.addActionListener(event -> {
             if (state.getPlayerCount() != 2) {
                 JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -54,10 +54,11 @@ public class GuiButton extends JPanel {
         buttonBacksies.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonBacksies.setEnabled(false);
         buttonBacksies.addActionListener(e -> {
-//            TODO
-//                - 자기 턴에 버튼 활성화
-//                - 버튼 클릭 시 한 번 무르기
-//                - 무르기를 한 번 사용했다면 버튼 계속 비활성화 상태로 두기 (한 게임에 한 번만 사용 가능)
+            try {
+                stream.sendMessage("Return|" + player.getMyStone());
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
         });
         add(buttonBacksies);
     }
@@ -77,7 +78,8 @@ public class GuiButton extends JPanel {
     }
 
     public void setButtonBacksiesState() {
-        if (state.getGameState())
-            buttonBacksies.setEnabled(player.getMyStone().equals(turn.getTurn()));
+        if (state.getGameState()) {
+            buttonBacksies.setEnabled(!player.getMyStone().equals(turn.getTurn()) && player.isCanReturn() && !state.getPreviousTurnReturned());
+        }
     }
 }
