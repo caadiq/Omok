@@ -73,6 +73,8 @@ public class GameMethod {
         return Map[y][x] == null;
     }
 
+    public String getStone(int y,int x){return Map[y][x];}
+
     public String[][] getMap() {
         return Map;
     }
