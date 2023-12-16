@@ -10,7 +10,7 @@ public class MainFrame extends JFrame {
     private static final int frameWidth = 1360;
     private static final int frameHeight = 1000;
 
-    private Stream stream;
+    private final Stream stream;
     private final Player player;
     private final State state;
     private final Turn turn;
@@ -129,7 +129,6 @@ public class MainFrame extends JFrame {
                     }
                 } catch (SocketException e) {
                     JOptionPane.showMessageDialog(this, "서버 연결이 끊어졌습니다.", "", JOptionPane.ERROR_MESSAGE);
-                    stream.reconnect();
                     break;
                 } catch (IOException e) {
                     e.printStackTrace();
