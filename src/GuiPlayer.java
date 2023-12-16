@@ -20,24 +20,28 @@ public class GuiPlayer extends JPanel {
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
 
+        // 내 캐릭터 이미지
         myCharacter = new JLabel();
         myCharacter.setSize(imageLength, imageLength);
         myCharacter.setLocation(0, 0);
         myCharacter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         add(myCharacter);
 
+        // 나를 표시하는 텍스트
         JLabel meLabel = new JLabel("나");
         meLabel.setSize(20, 20);
         meLabel.setLocation(imageLength / 2 - 5, imageLength + 10);
         meLabel.setFont(new Font("Dialog", Font.BOLD, 20));
         add(meLabel);
 
+        // 상대 캐릭터 이미지
         opCharacter = new JLabel();
         opCharacter.setSize(imageLength, imageLength);
         opCharacter.setLocation(imageLength + 15, 0);
         opCharacter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         add(opCharacter);
 
+        // 상대를 표시하는 텍스트
         JLabel opLabel = new JLabel("상대");
         opLabel.setSize(40, 20);
         opLabel.setLocation((imageLength / 2 - 5) + imageLength, imageLength + 10);

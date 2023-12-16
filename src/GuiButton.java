@@ -35,13 +35,10 @@ public class GuiButton extends JPanel {
                 JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 try {
-                    stream.sendMessage("State|" + "Ready");
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    stream.sendMessage("State|Ready");
+                } catch (IOException e) {
+                    System.out.println("Error : " + e.getMessage());
                 }
-//            TODO
-//                - 버튼 클릭 시 준비 완료 상태로 변경 (버튼 비활성화 하기)
-//                - 두 명 모두 준비 완료 시 게임 시작
                 buttonReady.setEnabled(false);
             }
         });
@@ -53,11 +50,11 @@ public class GuiButton extends JPanel {
         buttonBacksies.setLocation(195, 0);
         buttonBacksies.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonBacksies.setEnabled(false);
-        buttonBacksies.addActionListener(e -> {
+        buttonBacksies.addActionListener(event -> {
             try {
                 stream.sendMessage("Return|" + player.getMyStone());
-            } catch (IOException e2) {
-                e2.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("Error : " + e.getMessage());
             }
         });
         add(buttonBacksies);
