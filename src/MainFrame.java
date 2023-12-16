@@ -59,6 +59,11 @@ public class MainFrame extends JFrame {
             @Override
             public void windowClosing(WindowEvent event) {
                 super.windowClosing(event);
+                try {
+                    stream.sendMessage("GameOver|PlayerExit");
+                } catch (IOException e) {
+                    System.out.println("ERROR : " + e.getMessage());
+                }
                 stream.close();
             }
         });
@@ -124,7 +129,7 @@ public class MainFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "서버 연결이 끊어졌습니다.", "", JOptionPane.ERROR_MESSAGE);
                     break;
                 } catch (IOException e) {
-                    System.out.println("Error : " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }).start();
