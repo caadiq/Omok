@@ -59,7 +59,7 @@ public class MainFrame extends JFrame {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            // TODO: 종료 시 수행하고자 하는 특정 연산을 추가
+
         });
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 

@@ -31,7 +31,7 @@ public class GuiButton extends JPanel {
         buttonReady.setLocation(0, 0);
         buttonReady.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonReady.addActionListener(event -> {
-            if (state.getPlayerCount() != 2) {
+            if (state.getPlayerCount() != 2) { //클릭시 서버에 접속한 사람이 2명이 아니라면, 메세지를 띄움
                 JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 try {

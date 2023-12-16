@@ -51,7 +51,7 @@ public class GameStart extends JFrame {
             try {
                 String[] message = stream.receiveMessage();
                 if (message[0].equals("Room")) {
-                    String roomState = message[1];
+                    String roomState = message[1]; //서버로부터 접속가능 여부를 받아와서 접속이 가능한 아닌지 구분
                     if (roomState.equals("입장가능")) {
                         Player.getInstance().setNickname(nickname);
                         try {
