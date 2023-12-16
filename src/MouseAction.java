@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -12,6 +13,7 @@ public class MouseAction extends MouseAdapter {
     private final Turn turn;
     String currentPlayer;
     String OtherPlayer;
+
     public MouseAction(GameMethod gameMethod, GuiBoard guiBoard) {
         this.gameMethod = gameMethod;
         this.guiBoard = guiBoard;
@@ -26,10 +28,9 @@ public class MouseAction extends MouseAdapter {
     public void mousePressed(MouseEvent mouseEvent) {
         String currentTurn = turn.getTurn();
         String myStoneColor = player.getMyStone();
-        if(myStoneColor.equals("흰색")){
+        if (myStoneColor.equals("흰색")) {
             OtherPlayer = "검은색";
-        }
-        else if(myStoneColor.equals("검은색")){
+        } else if (myStoneColor.equals("검은색")) {
             OtherPlayer = "흰색";
         }
         currentPlayer = myStoneColor;
@@ -55,8 +56,11 @@ public class MouseAction extends MouseAdapter {
             System.out.println("돌이 이미 놓여져 있습니다");
             return;
         }
-        if(myStoneColor.equals("검은색")){
-            if(samsam(x,y)){
+
+        // 자신이 검은 돌의 플레이어일 때, 3:3 금지 적용
+        if (myStoneColor.equals("검은색")) {
+            if (samsam(x, y)) {
+                JOptionPane.showMessageDialog(guiBoard, "삼삼입니다. 돌을 놓을 수 없습니다.", "", JOptionPane.INFORMATION_MESSAGE);
                 System.out.println("삼삼입니다. 돌을 놓을 수 없습니다.");
                 return;
             }
@@ -73,50 +77,49 @@ public class MouseAction extends MouseAdapter {
             e.printStackTrace();
         }
 
-        if (gameMethod.endGame(stone)) {
+        if (gameMethod.endGame(stone)) { //게임이 종료되었을 때
             try {
-                stream.sendMessage("Winner|" + currentTurn);
+                stream.sendMessage("Winner|" + currentTurn); //이긴사람이 누구인지를 서버로 전송
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    //현재 돌을 놓은 위치가 3:3 알고리즘에 위배되는지 검사하는 메소드
     private boolean samsam(int x, int y) {
-        int open_sam_count = 0;
-        open_sam_count += find1(x,y);
-        open_sam_count += find2(x,y);
-        open_sam_count += find3(x,y);
-        open_sam_count += find4(x,y);
+        //놓은 위치를 기준으로 상하, 좌우, 우측 대각선, 좌측 대각선 중 돌이 2개가 있는게 2개 이상 일때, 3:3이라는 것을 알림
 
-        if (open_sam_count >= 2)
+        int open_sam_count = 0;
+        open_sam_count += find1(x, y); //좌우 검색
+        open_sam_count += find2(x, y); //우측으로 내려가는 대각선 확인
+        open_sam_count += find3(x, y); //상하 검색
+        open_sam_count += find4(x, y); //우측으로 올라가는 대각선 확인
+
+        if (open_sam_count >= 2)//돌이 2개가 있는게 2개 이상 일때, 3:3이다
             return true;
         else
             return false;
     }
 
+    //좌우를 체크하는 메소드 ← → 탐색
     private int find1(int x, int y) {
         String p = currentPlayer;
         String o = OtherPlayer;
         int stone1 = 0;
         int stone2 = 0;
         int allStone = 0;
-        //열린 3인지 체크하기위한것..
+        // 돌들 중간에 빈공간이 몇개인지 체크하는 변수
         int blink1 = 1;
 
-        //blink2 는 blink1 과 같음 중간에서넣어줄거임.
-        //int blink2 = blink1;
-
-
-        // ←
-        int xx = x - 1; //달라지는 좌표
+        // 놓은 자리의 왼쪽에 있는 돌들 세기
+        int xx = x - 1; //놓은자리 왼쪽에서부터 왼쪽으로 1칸씩 이동시킴.
         boolean check = false;
-        left:
         while (true) {
 
-            //좌표끝도달
+            //오목판 끝에 도달했을 때, 종료
             if (xx == -1)
-                break left;
+                break;
 
             //check를 false로 바꿈으로 두번연속으로 만나는지 확인할수있게.
             if (Objects.equals(gameMethod.getStone(y, xx), p)) {
@@ -126,41 +129,38 @@ public class MouseAction extends MouseAdapter {
 
             //상대돌을 만나면 탐색중지
             if (Objects.equals(gameMethod.getStone(y, xx), o))
-                break left;
+                break;
 
-            if (gameMethod.getStone(y,xx) == null) {
+            if (gameMethod.getStone(y, xx) == null) {
                 //처음 빈공간을만나 check가 true가 됬는데
-                //연달아 빈공간을만나면 탐색중지
-                //두번연속으로 빈공간만날시 blink카운트를 되돌림.
+                //연달아 빈공간을만나면 3:3이 아닌것으로 판정
                 if (check == false) {
                     check = true;
                 } else {
                     blink1++;
-                    break left;
+                    break;
                 }
 
                 if (blink1 == 1) {
                     blink1--;
                 } else {
-                    break left; //빈공간을만났으나 빈공간을 두번만나면 끝임
+                    break; //빈공간을 두번 만나면 끝. 3:3이 아닌것임
                 }
             }
-            //계속탐색
             xx--;
         }
 
 
         // →
-        xx = x + 1; //달라지는 좌표
+        xx = x + 1; //놓은자리 오른쪽에서부터 오른쪽으로 1칸씩 이동시킴
         int blink2 = blink1; //blink1남은거만큼 blink2,
         if (blink1 == 1) //빈공간을 만나지않은경우 없었음을기록
             blink1 = 0;
         check = false;
-        right:
         while (true) {
-            //좌표끝도달
+            //오목판 끝에 도달
             if (xx == 19)
-                break right;
+                break;
 
             if (Objects.equals(gameMethod.getStone(y, xx), p)) {
                 check = false;
@@ -169,21 +169,21 @@ public class MouseAction extends MouseAdapter {
 
             //상대돌을 만나면 탐색중지
             if (Objects.equals(gameMethod.getStone(y, xx), o))
-                break right;
+                break;
 
-            if (gameMethod.getStone(y,xx) == null) {
+            if (gameMethod.getStone(y, xx) == null) {
                 //두번연속으로 빈공간만날시 blink카운트를 되돌림.
                 if (check == false) {
                     check = true;
                 } else {
                     blink2++;
-                    break right;
+                    break;
                 }
 
                 if (blink2 == 1) {
                     blink2--;
                 } else {
-                    break right; //빈공간을만났으나 빈공간을 두번만나면 끝임
+                    break;
                 }
             }
             xx++;
@@ -191,7 +191,6 @@ public class MouseAction extends MouseAdapter {
 
         allStone = stone1 + stone2;
         //삼삼이므로 돌갯수가 2 + 1(현재돌)이아니면 0리턴
-        //이부분이 43을 허용하게해줌. 33만 찾게됨
         if (allStone != 2) {
             return 0;
         }
@@ -203,8 +202,8 @@ public class MouseAction extends MouseAdapter {
         //벽으로 막힌경우 - 열린3이 아님
         if (x - left == 0 || x + right == 18) {
             return 0;
-        } else //상대돌로 막힌경우 - 열린3이 아님
-            if (Objects.equals(gameMethod.getStone(y,x - left - 1),p) || Objects.equals(gameMethod.getStone(y,x + right + 1),o)) {
+        } else //끝이 상대 돌로 막힌 경우 즉, 이경우는 3:3이 아님
+            if (Objects.equals(gameMethod.getStone(y, x - left - 1), p) || Objects.equals(gameMethod.getStone(y, x + right + 1), o)) {
                 return 0;
             } else {
                 return 1; //열린3 일때 1 리턴
@@ -229,7 +228,7 @@ public class MouseAction extends MouseAdapter {
         leftUp:
         while (true) {
             if (xx == -1 || yy == -1)
-                break leftUp;
+                break;
 
             if (Objects.equals(gameMethod.getStone(yy, xx), p)) {
                 check = false;
@@ -237,20 +236,20 @@ public class MouseAction extends MouseAdapter {
             }
 
             if (Objects.equals(gameMethod.getStone(yy, xx), o))
-                break leftUp;
+                break;
 
-            if (gameMethod.getStone(yy,xx) == null) {
+            if (gameMethod.getStone(yy, xx) == null) {
                 if (check == false) {
                     check = true;
                 } else {
                     blink1++;
-                    break leftUp;
+                    break;
                 }
 
                 if (blink1 == 1) {
                     blink1--;
                 } else {
-                    break leftUp;
+                    break;
                 }
             }
             xx--;
@@ -265,10 +264,9 @@ public class MouseAction extends MouseAdapter {
         xx = x + 1;
         yy = y + 1;
         check = false;
-        rightDown:
         while (true) {
             if (xx == 19 || yy == 19)
-                break rightDown;
+                break;
 
             if (Objects.equals(gameMethod.getStone(yy, xx), p)) {
                 check = false;
@@ -276,20 +274,20 @@ public class MouseAction extends MouseAdapter {
             }
 
             if (Objects.equals(gameMethod.getStone(yy, xx), o))
-                break rightDown;
+                break;
 
-            if (gameMethod.getStone(yy,xx) == null) {
+            if (gameMethod.getStone(yy, xx) == null) {
                 if (check == false) {
                     check = true;
                 } else {
                     blink2++;
-                    break rightDown;
+                    break;
                 }
 
                 if (blink2 == 1) {
                     blink2--;
                 } else {
-                    break rightDown;
+                    break;
                 }
             }
 
@@ -307,7 +305,7 @@ public class MouseAction extends MouseAdapter {
 
         if (y - leftUp == 0 || x - leftUp == 0 || y + rightDown == 18 || x + rightDown == 18) {
             return 0;
-        } else if (Objects.equals(gameMethod.getStone(y - leftUp - 1,x - leftUp - 1),o) || Objects.equals(gameMethod.getStone(y + rightDown + 1,x + rightDown + 1),o)) {
+        } else if (Objects.equals(gameMethod.getStone(y - leftUp - 1, x - leftUp - 1), o) || Objects.equals(gameMethod.getStone(y + rightDown + 1, x + rightDown + 1), o)) {
             return 0;
         } else {
             return 1;
@@ -316,7 +314,7 @@ public class MouseAction extends MouseAdapter {
 
     }
 
-    // ↑ ↓ 탐색
+    // ↑ ↓ 탐색 // find1~4는 xx와 yy의 변화값만 다를뿐 알고리즘은 모두 동일함
     private int find3(int x, int y) {
         String p = currentPlayer;
         String o = OtherPlayer;
@@ -328,10 +326,9 @@ public class MouseAction extends MouseAdapter {
         // ↑
         int yy = y - 1;
         boolean check = false;
-        up:
         while (true) {
             if (yy == -1)
-                break up;
+                break;
 
             if (Objects.equals(gameMethod.getStone(yy, x), p)) {
                 check = false;
@@ -339,20 +336,20 @@ public class MouseAction extends MouseAdapter {
             }
 
             if (Objects.equals(gameMethod.getStone(yy, x), o))
-                break up;
+                break;
 
-            if (gameMethod.getStone(yy,x) == null) {
+            if (gameMethod.getStone(yy, x) == null) {
                 if (check == false) {
                     check = true;
                 } else {
                     blink1++;
-                    break up;
+                    break;
                 }
 
                 if (blink1 == 1) {
                     blink1--;
                 } else {
-                    break up;
+                    break;
                 }
             }
             yy--;
@@ -364,10 +361,9 @@ public class MouseAction extends MouseAdapter {
             blink1 = 0;
         yy = y + 1;
         check = false;
-        down:
         while (true) {
             if (yy == 19)
-                break down;
+                break;
 
             if (Objects.equals(gameMethod.getStone(yy, x), p)) {
                 check = false;
@@ -375,20 +371,20 @@ public class MouseAction extends MouseAdapter {
             }
 
             if (Objects.equals(gameMethod.getStone(yy, x), o))
-                break down;
+                break;
 
-            if (gameMethod.getStone(yy,x) == null) {
+            if (gameMethod.getStone(yy, x) == null) {
                 if (check == false) {
                     check = true;
                 } else {
                     blink2++;
-                    break down;
+                    break;
                 }
 
                 if (blink2 == 1) {
                     blink2--;
                 } else {
-                    break down;
+                    break;
                 }
             }
 
@@ -405,7 +401,7 @@ public class MouseAction extends MouseAdapter {
 
         if (y - up == 0 || y + down == 18) {
             return 0;
-        } else if (Objects.equals(gameMethod.getStone(y - up - 1,x),o) || Objects.equals(gameMethod.getStone(y + down + 1,x),o)) {
+        } else if (Objects.equals(gameMethod.getStone(y - up - 1, x), o) || Objects.equals(gameMethod.getStone(y + down + 1, x), o)) {
             return 0;
         } else {
             return 1;
@@ -426,10 +422,9 @@ public class MouseAction extends MouseAdapter {
         int xx = x - 1;
         int yy = y + 1;
         boolean check = false;
-        leftDown:
         while (true) {
             if (xx == -1 || yy == 19)
-                break leftDown;
+                break;
 
             if (Objects.equals(gameMethod.getStone(yy, xx), p)) {
                 check = false;
@@ -437,20 +432,20 @@ public class MouseAction extends MouseAdapter {
             }
 
             if (Objects.equals(gameMethod.getStone(yy, xx), o))
-                break leftDown;
+                break;
 
-            if (gameMethod.getStone(yy,xx) == null) {
+            if (gameMethod.getStone(yy, xx) == null) {
                 if (check == false) {
                     check = true;
                 } else {
                     blink1++;
-                    break leftDown;
+                    break;
                 }
 
                 if (blink1 == 1) {
                     blink1--;
                 } else {
-                    break leftDown;
+                    break;
                 }
             }
             xx--;
@@ -464,10 +459,9 @@ public class MouseAction extends MouseAdapter {
         xx = x + 1;
         yy = y - 1;
         check = false;
-        rightUp:
         while (true) {
             if (xx == 19 || yy == -1)
-                break rightUp;
+                break;
 
             if (Objects.equals(gameMethod.getStone(yy, xx), p)) {
                 check = false;
@@ -475,20 +469,20 @@ public class MouseAction extends MouseAdapter {
             }
 
             if (Objects.equals(gameMethod.getStone(yy, xx), o))
-                break rightUp;
+                break;
 
-            if (gameMethod.getStone(yy,xx) == null) {
+            if (gameMethod.getStone(yy, xx) == null) {
                 if (check == false) {
                     check = true;
                 } else {
                     blink2++;
-                    break rightUp;
+                    break;
                 }
 
                 if (blink2 == 1) {
                     blink2--;
                 } else {
-                    break rightUp;
+                    break;
                 }
             }
             xx++;
@@ -504,7 +498,7 @@ public class MouseAction extends MouseAdapter {
 
         if (x - leftDown == 0 || y - rightUp == 0 || y + leftDown == 18 || x + rightUp == 18) {
             return 0;
-        } else if (Objects.equals(gameMethod.getStone(y + leftDown + 1,x - leftDown - 1),o) || Objects.equals(gameMethod.getStone(y - rightUp - 1,x + rightUp + 1),o)) {
+        } else if (Objects.equals(gameMethod.getStone(y + leftDown + 1, x - leftDown - 1), o) || Objects.equals(gameMethod.getStone(y - rightUp - 1, x + rightUp + 1), o)) {
             return 0;
         } else {
             return 1;
