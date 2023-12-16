@@ -289,10 +289,9 @@ public class Server {
                     }
                 } catch (IOException e1) {
                     try {
-//                        dataOutputStream.close();
-//                        dataInputStream.close();
-//                        clientSocket.close();
-                        // 얘 그냥 지워버리니까 오류 안난다;;
+                        dataOutputStream.close();
+                        dataInputStream.close();
+                        clientSocket.close();
                         System.out.println("소켓 종료4");
                         removeUserSession(this);
                         break;
