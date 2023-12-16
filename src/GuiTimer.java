@@ -12,11 +12,13 @@ public class GuiTimer extends JPanel {
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
 
+        // 프로그레스바
         progressBar = new JProgressBar(0, 30);
         progressBar.setSize(300, 24);
         progressBar.setLocation(0, 2);
         add(progressBar);
 
+        // 남은 시간 텍스트
         timeLabel = new JLabel("00:30");
         timeLabel.setSize(65, 24);
         timeLabel.setLocation(310, 0);

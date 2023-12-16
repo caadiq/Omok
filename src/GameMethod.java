@@ -14,7 +14,7 @@ public class GameMethod {
     // 승리 조건
     public boolean endGame(Stone stone) {
         String nowTurn = Turn.getInstance().getTurn();
-        int[][] dir = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}};
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {-1, 1}, {1, -1}, {-1, -1}, {1, 1}}; // 검사할 방향(돌 기준 8방향) 설정
 
         for (int i = 0; i < 8; i += 2) {
             int stoneLine = 1;
@@ -23,8 +23,8 @@ public class GameMethod {
 
             // 돌 기준 한쪽 방향으로 연속으로 놓여진 같은 색상의 돌 세기
             for (int j = 1; j < 5; j++) {
-                stoneY += dir[i][0];
-                stoneX += dir[i][1];
+                stoneY += directions[i][0];
+                stoneX += directions[i][1];
                 if (stoneY < 0 || stoneY >= MaxSize || stoneX < 0 || stoneX >= MaxSize || !nowTurn.equals(Map[stoneY][stoneX])) {
                     break;
                 }
@@ -32,8 +32,8 @@ public class GameMethod {
             }
 
             // 연속으로 놓여진 돌이 6개 이상인지 확인
-            int nextY = stoneY + dir[i][0];
-            int nextX = stoneX + dir[i][1];
+            int nextY = stoneY + directions[i][0];
+            int nextX = stoneX + directions[i][1];
             boolean isMoreThanFive = nextY >= 0 && nextY < MaxSize && nextX >= 0 && nextX < MaxSize && nowTurn.equals(Map[nextY][nextX]);
 
             stoneY = stone.getY();
@@ -41,8 +41,8 @@ public class GameMethod {
 
             // 돌 기준 반대쪽 방향으로 연속으로 놓여진 같은 색상의 돌 세기
             for (int j = 1; j < 5; j++) {
-                stoneY += dir[i + 1][0];
-                stoneX += dir[i + 1][1];
+                stoneY += directions[i + 1][0];
+                stoneX += directions[i + 1][1];
 
                 if (stoneY < 0 || stoneY >= MaxSize || stoneX < 0 || stoneX >= MaxSize || !nowTurn.equals(Map[stoneY][stoneX])) {
                     break;
@@ -51,8 +51,8 @@ public class GameMethod {
             }
 
             // 연속으로 놓여진 돌이 6개 이상인지 확인
-            nextY = stoneY + dir[i + 1][0];
-            nextX = stoneX + dir[i + 1][1];
+            nextY = stoneY + directions[i + 1][0];
+            nextX = stoneX + directions[i + 1][1];
             isMoreThanFive = isMoreThanFive || (nextY >= 0 && nextY < MaxSize && nextX >= 0 && nextX < MaxSize && nowTurn.equals(Map[nextY][nextX]));
 
             // 돌을 5개 연속으로 놓고, 6개 이상이 아니라면 승리
@@ -73,7 +73,9 @@ public class GameMethod {
         return Map[y][x] == null;
     }
 
-    public String getStone(int y,int x){return Map[y][x];}
+    public String getStone(int y, int x) {
+        return Map[y][x];
+    }
 
     public String[][] getMap() {
         return Map;

@@ -16,6 +16,7 @@ public class GuiChat extends JPanel {
         setSize(layoutWidth, layoutHeight);
         setLayout(null);
 
+        // 텍스트 출력 영역
         textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setFocusable(false);
@@ -24,11 +25,13 @@ public class GuiChat extends JPanel {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
 
+        // textArea에 스크롤 추가
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setSize(375, 524);
         scrollPane.setLocation(0, 0);
         add(scrollPane);
 
+        // 텍스트 입력 영역
         JTextField textField = new JTextField();
         textField.setSize(375, 50);
         textField.setLocation(0, 529);
@@ -41,7 +44,7 @@ public class GuiChat extends JPanel {
             try {
                 stream.sendMessage("Chat|" + nickname + " : " + strTextField);
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Error : " + e.getMessage());
             }
 
             textField.selectAll();
@@ -55,11 +58,11 @@ public class GuiChat extends JPanel {
         SwingUtilities.invokeLater(() -> textArea.append(message + "\n"));
     }
 
-    public void setUserEntered(String message) {
-        SwingUtilities.invokeLater(() -> textArea.append(message + "님이 입장하셨습니다" + "\n"));
-    }
-
-    public void setUserOut(String message) {
-        SwingUtilities.invokeLater(() -> textArea.append(message + "님이 퇴장하셨습니다" + "\n"));
+    // 플레이어 접속 및 퇴장 메시지 출력
+    public void setUserStateMessage(String message) {
+        String[] messages = message.split(",");
+        String nickname = messages[0];
+        String state = messages[1];
+        SwingUtilities.invokeLater(() -> textArea.append(nickname + "님이 " + state + "하셨습니다" + "\n"));
     }
 }

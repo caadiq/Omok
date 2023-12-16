@@ -98,7 +98,7 @@ public class GuiBoard extends JPanel {
         repaint();
     }
 
-    // 돌 상태 가져오기
+    // 돌 상태(좌표, 색상) 가져오기
     public void setStone(String message) {
         String[] stonePosition = message.split(",");
 
