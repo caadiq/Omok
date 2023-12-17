@@ -120,8 +120,8 @@ public class GuiBoard extends JPanel {
         putStone(y, x, null);
 
         if (!player.getMyStone().equals(turn))
-            JOptionPane.showMessageDialog(this, "상대방이 무르기를 사용했습니다.\n상대방에게 턴이 넘어갑니다.", "", JOptionPane.INFORMATION_MESSAGE);
+            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "상대방이 무르기를 사용했습니다.\n상대방에게 턴이 넘어갑니다.", "", JOptionPane.INFORMATION_MESSAGE));
         else
-            JOptionPane.showMessageDialog(this, "무르기를 사용했습니다.\n남은 무르기 횟수는 0입니다.", "", JOptionPane.INFORMATION_MESSAGE);
+            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "무르기를 사용했습니다.\n남은 무르기 횟수는 0입니다.", "", JOptionPane.INFORMATION_MESSAGE));
     }
 }

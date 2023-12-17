@@ -6,7 +6,6 @@ public class GuiButton extends JPanel {
     private static final int layoutWidth = 375;
     private static final int layoutHeight = 70;
 
-    private final MainFrame mainFrame;
     private final Stream stream;
     private final Player player;
     private final State state;
@@ -15,8 +14,7 @@ public class GuiButton extends JPanel {
     private final JButton buttonBacksies;
     private final JButton buttonReady;
 
-    public GuiButton(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public GuiButton() {
         stream = Stream.getInstance();
         player = Player.getInstance();
         state = State.getInstance();
@@ -32,7 +30,7 @@ public class GuiButton extends JPanel {
         buttonReady.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonReady.addActionListener(event -> {
             if (state.getPlayerCount() != 2) { //클릭시 서버에 접속한 사람이 2명이 아니라면, 메세지를 띄움
-                JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE);
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, "상대방이 아직 들어오지 않았습니다", "", JOptionPane.INFORMATION_MESSAGE));
             } else {
                 try {
                     stream.sendMessage("State|Ready");
@@ -58,12 +56,6 @@ public class GuiButton extends JPanel {
             }
         });
         add(buttonBacksies);
-    }
-
-    public void printGameStart() {
-        String color = player.getMyStone();
-        String msg = "게임시작! 당신은 " + color + "입니다.";
-        JOptionPane.showMessageDialog(mainFrame, msg, "", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void setbuttonReadyEnable() {

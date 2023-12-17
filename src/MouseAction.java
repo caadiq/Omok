@@ -60,7 +60,7 @@ public class MouseAction extends MouseAdapter {
         // 자신이 검은 돌의 플레이어일 때, 3:3 금지 적용
         if (myStoneColor.equals("검은색")) {
             if (samsam(x, y)) {
-                JOptionPane.showMessageDialog(guiBoard, "삼삼입니다. 돌을 놓을 수 없습니다.", "", JOptionPane.INFORMATION_MESSAGE);
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(guiBoard, "삼삼입니다. 돌을 놓을 수 없습니다.", "", JOptionPane.INFORMATION_MESSAGE));
                 return;
             }
 
