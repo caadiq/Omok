@@ -8,8 +8,6 @@ import java.util.*;
 import java.util.List;
 
 public class Server {
-
-    private boolean IsPlaying = false;
     private static final int SERVER_PORT = 10000;
     private static final int USER_LIMIT = 2;
 
@@ -28,8 +26,7 @@ public class Server {
     private Timer timer;
     private final int timeLimit = 30; // 타이머 30초
 
-    private record UserSession(UserService userService, String nickname) {
-    }
+    private record UserSession(UserService userService, String nickname) { }
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -147,12 +144,10 @@ public class Server {
             @Override
             public void run() {
                 timeLeft--;
-                if(IsPlaying){
-                    sendMessageToAllClient("Timer|" + timeLeft);
-                    if (timeLeft <= 0) { // 타이머가 0초가 되면
-                        timer.cancel(); // 타이머 중지
-                        switchTurn(currentTurn, previousTurnReturned); // 턴 전환
-                    }
+                sendMessageToAllClient("Timer|" + timeLeft);
+                if (timeLeft <= 0) { // 타이머가 0초가 되면
+                    timer.cancel(); // 타이머 중지
+                    switchTurn(currentTurn, previousTurnReturned); // 턴 전환
                 }
             }
         }, 0, 1000); // 1초마다 반복
@@ -256,8 +251,12 @@ public class Server {
                     String[] messages = message.split("\\|");
 
                     switch (messages[0]) {
-                        case "PlayerEnter" ->
-                                System.out.println(messages[1] + "입장. 현재 플레이어 수 : " + userVector.size() + "명");
+                        case "PlayerEnter" -> System.out.println(messages[1] + "입장. 현재 플레이어 수 : " + userVector.size() + "명");
+                        case "PlayerExit" -> {
+                            readyCount = 0;
+                            if (timer != null) timer.cancel();
+                            sendMessageToAllClient(message);
+                        }
                         case "State" -> {
                             if (messages[1].equals("Ready")) {
                                 readyCount++; // 준비 완료된 플레이어 수 증가
@@ -266,7 +265,6 @@ public class Server {
                                 if (readyCount == USER_LIMIT) { // 모든 인원이 준비하면 게임 시작 상태로 변경
                                     startGame();
                                     System.out.println("게임 시작");
-                                    IsPlaying =true;
                                 }
                                 sendMessageToAllClient(message);
                             }
@@ -282,12 +280,9 @@ public class Server {
                                 sendMessageToAllClient("GameOver|" + messages[1]);
 
                             readyCount = 0;
-                            if(timer !=null){
-                                timer.cancel();
-                            }
+                            if (timer != null) timer.cancel();
 
                             System.out.println("게임 종료");
-                            IsPlaying =false;
                         }
                         case "StonePosition" -> {
                             stonePosition = messages[1];
