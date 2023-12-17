@@ -170,7 +170,6 @@ public class Server {
             if (readyCount > 0) readyCount--; // 준비 완료 수 감소
 
             System.out.println(exitUserSession.nickname + "퇴장. 현재 플레이어 수 : " + userVector.size() + "명");
-            System.out.println("준비 완료 : " + readyCount + "명");
         }
     }
 
@@ -191,7 +190,6 @@ public class Server {
                     if (nicknameExists) { // 닉네임 중복 시
                         dataOutputStream.writeUTF("Nickname|중복");
                         clientSocket.close(); // 해당 클라이언트 소켓 닫기
-                        System.out.println("소켓 종료1");
                     } else if (userVector.size() < USER_LIMIT) { // 접속 중인 인원이 2명보다 적으면
                         UserService userService = new UserService(dataInputStream, dataOutputStream);
                         UserSession userSession = new UserSession(userService, nickname);
@@ -203,7 +201,6 @@ public class Server {
                     } else { // 접속 중인 인원이 2명이라면
                         dataOutputStream.writeUTF("Room|입장불가능");
                         clientSocket.close(); // 해당 클라이언트 소켓 닫기
-                        System.out.println("소켓 종료2");
                     }
                 } catch (IOException e) {
                     System.out.println("Error : " + e.getMessage());
@@ -235,7 +232,6 @@ public class Server {
                     dataOutputStream.close();
                     dataInputStream.close();
                     clientSocket.close();
-                    System.out.println("소켓 종료3");
                 } catch (IOException e2) {
                     System.out.println("Error : " + e2.getMessage());
                 }
@@ -293,10 +289,6 @@ public class Server {
                     }
                 } catch (IOException e1) {
                     try {
-//                        dataOutputStream.close();
-//                        dataInputStream.close();
-//                        clientSocket.close();
-                        System.out.println("소켓 종료4");
                         removeUserSession(this);
                         break;
                     } catch (Exception e2) {

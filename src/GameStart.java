@@ -51,7 +51,7 @@ public class GameStart extends JFrame {
         String nickname = textField.getText().trim();
 
         if (nickname.isEmpty()) { // 닉네임을 입력하지 않으면
-            JOptionPane.showMessageDialog(this, "닉네임을 입력해주세요.");
+            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "닉네임을 입력해주세요."));
             return;
         }
 
@@ -60,7 +60,7 @@ public class GameStart extends JFrame {
             String[] message = stream.receiveMessage();
 
             if (message[0].equals("Nickname") && message[1].equals("중복")) { // 닉네임 중복 시
-                JOptionPane.showMessageDialog(this, "해당 닉네임의 유저가\n이미 접속 중입니다.", "", JOptionPane.INFORMATION_MESSAGE);
+                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "해당 닉네임의 유저가\n이미 접속 중입니다.", "", JOptionPane.INFORMATION_MESSAGE));
                 stream.reconnect(); // 서버와 연결이 종료되었으므로 재접속
             } else if (message[0].equals("Room")) {
                 String roomState = message[1];
@@ -71,7 +71,7 @@ public class GameStart extends JFrame {
                     SwingUtilities.invokeLater(MainFrame::new);
                     this.dispose();
                 } else if (roomState.equals("입장불가능")) {
-                    JOptionPane.showMessageDialog(this, "방이 꽉찼습니다.", "", JOptionPane.INFORMATION_MESSAGE);
+                    SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "방이 꽉찼습니다.", "", JOptionPane.INFORMATION_MESSAGE));
                     stream.reconnect(); // 서버와 연결이 종료되었으므로 재접속
                 }
             }

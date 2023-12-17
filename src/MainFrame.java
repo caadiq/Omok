@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
         setLayout(null); // 레이아웃 맘대로 설정
 
         // 버튼
-        GuiButton guiButton = new GuiButton(this);
+        GuiButton guiButton = new GuiButton();
         guiButton.setLocation(960, 880);
         add(guiButton);
 
@@ -80,7 +80,7 @@ public class MainFrame extends JFrame {
                         case "State" -> {
                             if (message[1].equals("Start")) {
                                 state.setGameState(true);
-                                guiButton.printGameStart();
+                                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "게임시작! 당신은 " + player.getMyStone() + "입니다.", "", JOptionPane.INFORMATION_MESSAGE));
                             }
                         }
                         case "StoneColor" -> player.setMyStone(message[1]);
@@ -102,10 +102,10 @@ public class MainFrame extends JFrame {
                         case "PlayerExit" -> guiButton.setbuttonReadyEnable();
                         case "GameOver" -> {
                             if (message[1].equals("PlayerExit")) {
-                                JOptionPane.showMessageDialog(this, "상대방이 나가서\n게임이 종료됩니다.", "", JOptionPane.INFORMATION_MESSAGE);
+                                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "상대방이 나가서\n게임이 종료됩니다.", "", JOptionPane.INFORMATION_MESSAGE));
                             } else {
                                 String result = message[1].equals(player.getMyStone()) ? "승리!" : "패배...";
-                                JOptionPane.showMessageDialog(this, result, "", JOptionPane.INFORMATION_MESSAGE);
+                                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, result, "", JOptionPane.INFORMATION_MESSAGE));
                             }
 
                             gameMethod.init();
@@ -130,10 +130,11 @@ public class MainFrame extends JFrame {
                         }
                     }
                 } catch (SocketException e) {
-                    JOptionPane.showMessageDialog(this, "서버 연결이 끊어졌습니다.", "", JOptionPane.ERROR_MESSAGE);
+                    SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "서버 연결이 끊어졌습니다.", "", JOptionPane.ERROR_MESSAGE));
                     break;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.out.println("ERROR : " + e.getMessage());
+                    break;
                 }
             }
         }).start();
