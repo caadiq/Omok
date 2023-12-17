@@ -1,5 +1,3 @@
-import com.sun.tools.javac.Main;
-
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -62,7 +60,10 @@ public class MainFrame extends JFrame {
             public void windowClosing(WindowEvent event) {
                 super.windowClosing(event);
                 try {
-                    stream.sendMessage("GameOver|PlayerExit");
+                    if (state.getGameState())
+                        stream.sendMessage("GameOver|PlayerExit");
+                    else
+                        stream.sendMessage("PlayerExit|");
                 } catch (IOException e) {
                     System.out.println("ERROR : " + e.getMessage());
                 }
@@ -98,6 +99,7 @@ public class MainFrame extends JFrame {
                         case "Timer" -> guiTimer.setTimer(message[1]);
                         case "Chat" -> guiChat.setMessage(message[1]);
                         case "Nickname" -> guiChat.setUserStateMessage(message[1]);
+                        case "PlayerExit" -> guiButton.setbuttonReadyEnable();
                         case "GameOver" -> {
                             if (message[1].equals("PlayerExit")) {
                                 JOptionPane.showMessageDialog(this, "상대방이 나가서\n게임이 종료됩니다.", "", JOptionPane.INFORMATION_MESSAGE);
