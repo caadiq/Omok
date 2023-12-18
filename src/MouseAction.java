@@ -11,8 +11,8 @@ public class MouseAction extends MouseAdapter {
     private final Player player;
     private final State state;
     private final Turn turn;
-    String currentPlayer;
-    String OtherPlayer;
+    private String myStoneColor;
+    private String opStoneColor;
 
     public MouseAction(GameMethod gameMethod, GuiBoard guiBoard) {
         this.gameMethod = gameMethod;
@@ -27,18 +27,15 @@ public class MouseAction extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
         String currentTurn = turn.getTurn();
-        String myStoneColor = player.getMyStone();
-        if (myStoneColor.equals("흰색")) {
-            OtherPlayer = "검은색";
-        } else if (myStoneColor.equals("검은색")) {
-            OtherPlayer = "흰색";
-        }
-        currentPlayer = myStoneColor;
-        int currentPlayerCount = state.getPlayerCount();
+        int myStoneColorCount = state.getPlayerCount();
         boolean canGameStart = state.getGameState();
 
+        myStoneColor = player.getMyStone();
+        if (myStoneColor != null)
+            opStoneColor = myStoneColor.equals("검은색") ? "흰색" : "검은색";
+
         // 내 턴이 아니거나 플레이어가 모두 준비되지 않았을 경우 클릭 방지
-        if (currentTurn != null && !currentTurn.equals(myStoneColor) || currentPlayerCount != 2 || !canGameStart) {
+        if (currentTurn != null && !currentTurn.equals(myStoneColor) || myStoneColorCount != 2 || !canGameStart) {
             return;
         }
 
@@ -102,8 +99,8 @@ public class MouseAction extends MouseAdapter {
 
     // ← →
     private int find1(int x, int y) {
-        String p = currentPlayer;
-        String o = OtherPlayer;
+        String p = myStoneColor;
+        String o = opStoneColor;
         int stone1 = 0;
         int stone2 = 0;
         int allStone;
@@ -210,8 +207,8 @@ public class MouseAction extends MouseAdapter {
 
     // ↖ ↘
     private int find2(int x, int y) {
-        String p = currentPlayer;
-        String o = OtherPlayer;
+        String p = myStoneColor;
+        String o = opStoneColor;
         int stone1 = 0;
         int stone2 = 0;
         int allStone;
@@ -310,8 +307,8 @@ public class MouseAction extends MouseAdapter {
 
     // ↑ ↓
     private int find3(int x, int y) {
-        String p = currentPlayer;
-        String o = OtherPlayer;
+        String p = myStoneColor;
+        String o = opStoneColor;
         int stone1 = 0;
         int stone2 = 0;
         int allStone;
@@ -405,8 +402,8 @@ public class MouseAction extends MouseAdapter {
 
     // ↙ ↗
     private int find4(int x, int y) {
-        String p = currentPlayer;
-        String o = OtherPlayer;
+        String p = myStoneColor;
+        String o = opStoneColor;
         int stone1 = 0;
         int stone2 = 0;
         int allStone;
