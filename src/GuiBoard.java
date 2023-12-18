@@ -49,10 +49,14 @@ public class GuiBoard extends JPanel {
 
         // 해당 좌표에 작은 점 그리기
         drawDot(graphics, 'd', 4);
+        drawDot(graphics, 'd', 10);
         drawDot(graphics, 'd', 16);
-        drawDot(graphics, 'p', 4);
-        drawDot(graphics, 'p', 16);
+        drawDot(graphics, 'j', 4);
         drawDot(graphics, 'j', 10);
+        drawDot(graphics, 'j', 16);
+        drawDot(graphics, 'p', 4);
+        drawDot(graphics, 'p', 10);
+        drawDot(graphics, 'p', 16);
     }
 
     // 선 위에 작은 점 그리기
