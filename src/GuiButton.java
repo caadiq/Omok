@@ -43,14 +43,14 @@ public class GuiButton extends JPanel {
         add(buttonReady);
 
         // 무르기 버튼
-        buttonBacksies = new JButton("무르기");
+        buttonBacksies = new JButton("무르기 요청");
         buttonBacksies.setSize(180, 70);
         buttonBacksies.setLocation(195, 0);
         buttonBacksies.setFont(new Font("Dialog", Font.BOLD, 22));
         buttonBacksies.setEnabled(false);
         buttonBacksies.addActionListener(event -> {
             try {
-                stream.sendMessage("Return|" + player.getMyStone());
+                stream.sendMessage("RequestReturn|" + player.getMyStone());
             } catch (IOException e) {
                 System.out.println("Error : " + e.getMessage());
             }
@@ -68,7 +68,7 @@ public class GuiButton extends JPanel {
 
     public void setButtonBacksiesState() {
         if (state.getGameState()) {
-            buttonBacksies.setEnabled(!player.getMyStone().equals(turn.getTurn()) && player.isCanReturn() && !state.getPreviousTurnReturned());
+            buttonBacksies.setEnabled(!player.getMyStone().equals(turn.getTurn()) && !state.getPreviousTurnReturned());
         }
     }
 }

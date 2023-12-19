@@ -3,7 +3,6 @@ public class Player {
     private String opponentCharacter;
     private String myStone;
     private String nickname;
-    private boolean canReturn;
 
     private static class PlayerHolder {
         private static final Player INSTANCE = new Player();
@@ -43,13 +42,5 @@ public class Player {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public boolean isCanReturn() {
-        return canReturn;
-    }
-
-    public void setCanReturn(boolean canReturn) {
-        this.canReturn = canReturn;
     }
 }
