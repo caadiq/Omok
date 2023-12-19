@@ -19,12 +19,11 @@ public class Server {
     private int readyCount = 0; // 준비 완료한 플레이어 수
     private String currentTurn = "검은색"; // 현재 턴
     private String stonePosition; // 돌의 좌표 및 색상
-    private boolean canBlackReturn = true; // 검은색 돌의 무르기 가능 여부
-    private boolean canWhiteReturn = true; // 흰색 돌의 무르기 가능 여부
     private boolean previousTurnReturned = false; // 상대방이 무르기를 사용 했는지 여부
 
     private Timer timer;
     private final int timeLimit = 30; // 타이머 30초
+    private boolean isTimerPaused = false;
 
     private record UserSession(UserService userService, String nickname) { }
 
@@ -68,10 +67,6 @@ public class Server {
         setStone();
         setCharacter();
         sendMessageToAllClient("State|Start");
-        sendMessageToAllClient("CanReturn|검은색,true");
-        sendMessageToAllClient("CanReturn|흰색,true");
-        canWhiteReturn = true;
-        canBlackReturn = true;
         previousTurnReturned = false;
         startTimer();
     }
@@ -119,15 +114,11 @@ public class Server {
     // 무르기
     private void returnStone(String stone) {
         if (!stone.equals(currentTurn)) {
-            if (stone.equals("검은색") && canBlackReturn) {
-                canBlackReturn = false;
+            if (stone.equals("검은색")) {
                 sendMessageToAllClient("Return|" + stonePosition);
-                sendMessageToAllClient("CanReturn|검은색,false");
                 switchTurn("흰색", true);
-            } else if (stone.equals("흰색") && canWhiteReturn) {
-                canWhiteReturn = false;
+            } else if (stone.equals("흰색")) {
                 sendMessageToAllClient("Return|" + stonePosition);
-                sendMessageToAllClient("CanReturn|흰색,false");
                 switchTurn("검은색", true);
             }
         }
@@ -143,11 +134,13 @@ public class Server {
 
             @Override
             public void run() {
-                timeLeft--;
-                sendMessageToAllClient("Timer|" + timeLeft);
-                if (timeLeft <= 0) { // 타이머가 0초가 되면
-                    timer.cancel(); // 타이머 중지
-                    switchTurn(currentTurn, previousTurnReturned); // 턴 전환
+                if (!isTimerPaused) {
+                    timeLeft--;
+                    sendMessageToAllClient("Timer|" + timeLeft);
+                    if (timeLeft <= 0) { // 타이머가 0초가 되면
+                        timer.cancel(); // 타이머 중지
+                        switchTurn(currentTurn, previousTurnReturned); // 턴 전환
+                    }
                 }
             }
         }, 0, 1000); // 1초마다 반복
@@ -227,7 +220,6 @@ public class Server {
                 dataOutputStream.writeUTF(msg);
             } catch (IOException e1) {
                 System.out.println("Error : " + e1.getMessage());
-                System.out.println("아웃풋 데이터 오류");
                 try {
                     dataOutputStream.close();
                     dataInputStream.close();
@@ -284,7 +276,21 @@ public class Server {
                             stonePosition = messages[1];
                             sendMessageToAllClient(message);
                         }
-                        case "Return" -> returnStone(messages[1]);
+                        case "RequestReturn" -> {
+                            isTimerPaused = true;
+                            sendMessageToAllClient(message);
+                        }
+                        case "AllowReturn" -> {
+                            isTimerPaused = false;
+                            String[] allowState = messages[1].split(",");
+                            if (allowState[0].equals("Yes")) {
+                                returnStone(allowState[1]);
+                            } else {
+                                sendMessageToAllClient(message);
+                                previousTurnReturned = true;
+                                sendMessageToAllClient("PreviousTurnReturned|true");
+                            }
+                        }
                         default -> sendMessageToAllClient(message + "\n");
                     }
                 } catch (IOException e1) {

@@ -118,10 +118,29 @@ public class MainFrame extends JFrame {
                             player.setMyStone(null);
                         }
                         case "Return" -> guiBoard.returnStone(message[1]);
-                        case "CanReturn" -> {
-                            String[] canReturn = message[1].split(",");
-                            if (player.getMyStone().equals(canReturn[0])) {
-                                player.setCanReturn(Boolean.parseBoolean(canReturn[1]));
+                        case "RequestReturn" -> {
+                            if (!message[1].equals(player.getMyStone())) {
+                                SwingUtilities.invokeLater(() -> {
+                                    int result = JOptionPane.showConfirmDialog(this, "상대방이 무르기를 요청했습니다.\n수락하시겠습니까?", "무르기 요청", JOptionPane.YES_NO_OPTION);
+
+                                    try {
+                                        if (result == JOptionPane.YES_OPTION) {
+                                            stream.sendMessage("AllowReturn|Yes," + message[1]);
+                                        } else {
+                                            stream.sendMessage("AllowReturn|No," + message[1]);
+                                        }
+                                    } catch (Exception e) {
+                                        System.out.println("ERROR : " + e.getMessage());
+                                    }
+                                });
+                            }
+                        }
+                        case "AllowReturn" -> {
+                            String[] allowState = message[1].split(",");
+                            if (allowState[0].equals("Yes") && allowState[1].equals(player.getMyStone())) {
+                                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "상대방이 요청을 수락했습니다.\n내 턴입니다.", "무르기", JOptionPane.INFORMATION_MESSAGE));
+                            } else if (allowState[0].equals("No") && allowState[1].equals(player.getMyStone())) {
+                                SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "상대방이 요청을 거절했습니다.", "무르기", JOptionPane.INFORMATION_MESSAGE));
                             }
                         }
                         case "PreviousTurnReturned" -> {
